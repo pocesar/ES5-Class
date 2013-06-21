@@ -1,16 +1,14 @@
 var
   testCase = require('nodeunit').testCase,
   Class = require('../class'),
-  Animal, Bird, Dog, Beagle, animal, beagle, bird, dog;
+  Animal, Bird, Dog, Beagle, Color, Privat, animal, beagle, bird, dog, color, privat, privat2;
 
 module.exports = testCase({
-
   setUp: function (done){
-
     Animal = Class.extend(
       'Animal',
       {
-        init     : function (name){
+        construct: function (name){
           this.name = name;
           this.increment();
         },
@@ -20,59 +18,144 @@ module.exports = testCase({
         canFly   : false,
         increment: function (){
           var parent = this;
-          while (parent && parent.getClass && parent.getClass().count !== null) {
-            parent.getClass().count++;
-            parent = parent.parent;
+          while (parent && parent.$getClass && parent.$getClass().count !== null) {
+            parent.$getClass().count++;
+            parent = parent.$parent;
           }
         }
 
       },
       {
-        count: 0
-      });
+        count: 0,
+        run: function (){
+          for (var i = 1; i <= 10; i++) {
+            this.ran++;
+            console.log("It ran for " + i + " miles!");
+          }
+        },
+        ran: 0
+      }
+    );
 
     Bird = Animal.extend(
       'Bird',
       {
-        init: function (name){
-          this._super(name);
+        construct: function (name){
+          this.$super(name);
           this.canFly = true;
         }
       },
       {
         count: 0
-      });
+      }
+    );
 
-    Dog = Class.extend('Dog', { init: function (name){ this.name = name; }}, {});
-    Dog.include({ cry: function (){ return 'wof!'; } });
-    Dog.implement({ isBig: true });
+    Color = Class.extend('Color', {
+      setColor: function (name){
+        this.color = name;
+      }
+    }, {
+      color: 'brown'
+    });
+
+    Dog = Animal.extend('Dog', {
+      construct: function (name){
+        this.name = name;
+      }
+    }, {
+      run: function(){
+        this.ran += 20;
+        //this.$parent.run();
+      }
+    });
+
+    Dog.include({
+      cry: function (){
+        return 'wof!';
+      }
+    });
+
+    Dog.implement([{
+      isBig: true
+    }, Color]);
 
     Beagle = Class.extend('Beagle', {}, {});
-    Beagle.implement(Dog);
+    Beagle.implement([Dog, Color]);
     Beagle.include({
-      init: function (name){
+      construct: function (name){
         this.name = name;
+        this.setColor('white and brown');
       }
     });
     Beagle.isBig = false;
+
+    Privat = Class.extend('Private', function (){
+      var arr = [];
+
+      return {
+        construct: function(initial){
+          if (initial) {
+            arr = initial;
+          }
+        },
+        push : function (item){
+          arr.push(item);
+          return this;
+        },
+        items: function (){
+          return arr;
+        },
+        reset: function (){
+          arr = [];
+          return this;
+        }
+      };
+    });
+    
+    Privat.include(function(){
+      var another_private = 'yes';
+      
+      return {
+        'private': another_private,
+        'privateGet': function(){
+          return another_private;
+        }
+      };
+    });
+    
+    Privat.implement(function(){
+      var deal = -1;
+      
+      return {
+        deal: function(){
+          return ++deal;
+        }
+      };
+    });
 
     animal = Animal.create('An Animal');
     bird = Bird.create('A Bird');
     dog = Dog.create('A Dog');
     beagle = Beagle.create('A Beagle');
+    color = Color.create('A color');
+    privat = Privat.create([1,2,3,4]);
+    privat2 = Privat.create();
 
     done();
   },
 
   tearDown: function (done){
-    Animal = null;  
-    Bird = null;  
-    Dog = null;  
-    Beagle = null;  
-    animal = null;  
-    bird = null;  
-    dog = null;  
+    Animal = null;
+    Color = null;
+    Bird = null;
+    Dog = null;
+    Beagle = null;
+    Privat = null;
+    animal = null;
+    bird = null;
+    dog = null;
     beagle = null;
+    privat = null;
     done();
   },
 
@@ -87,72 +170,109 @@ module.exports = testCase({
   },
 
   testClasses: function (test){
-    test.expect(4);
+    test.expect(6);
     test.ok(Animal);
     test.ok(Bird);
     test.ok(Dog);
     test.ok(Beagle);
+    test.ok(Color);
+    test.ok(Privat);
     test.done();
   },
 
   testInstances: function (test){
-    test.expect(4);
+    test.expect(5);
     test.ok(animal);
     test.ok(bird);
     test.ok(dog);
     test.ok(beagle);
+    test.ok(privat);
     test.done();
   },
 
   testClassProperties: function (test){
-    test.expect(4);
+    test.expect(11);
+
     test.equals(Animal.count, 2);
+    test.deepEqual(Animal.$implements, []);
+
     test.equals(Bird.count, 1);
     test.equals(Dog.isBig, true);
     test.equals(Beagle.isBig, false);
+    test.equals(Beagle.color, 'brown');
+
+    test.ok(!Beagle.count);
+
+    test.ok(!Beagle.$implements[0].$isClass(Bird));
+    test.ok(!Beagle.$implements[0].$isClass(Animal));
+    test.ok(Beagle.$implements[0].$isClass(Dog));
+    test.ok(Beagle.$implements[1].$isClass(Color));
+
     test.done();
   },
 
   testInstanceProperties: function (test){
-    test.expect(7);
+    test.expect(12);
+
     test.equals(animal.name, 'An Animal');
+    test.deepEqual(animal.$implements, []);
     test.equals(bird.name, 'A Bird');
     test.equals(animal.canFly, false);
     test.equals(bird.canFly, true);
-    test.equals(bird.parent.canFly, false);
+    test.equals(bird.$parent.canFly, false);
     test.equals(dog.name, 'A Dog');
+    test.equals(Dog.color, 'brown');
     test.equals(beagle.name, 'A Beagle');
+    test.equals(beagle.color, 'white and brown');
+
+    test.ok(beagle.$implements[0].$isClass(Dog));
+    test.ok(beagle.$implements[1].$isClass(Color));
+
     test.done();
   },
 
   testInstanceOf: function (test){
-    test.expect(1);
-    test.ok(animal.instanceOf);
+    test.expect(2);
+
+    test.ok(animal.$instanceOf);
+    test.ok(privat.$instanceOf);
+
+    test.done();
+  },
+
+  testIsClass: function (test){
+    test.expect(4);
+
+    test.ok(animal.$isClass(Animal));
+    test.ok(!animal.$isClass(Class));
+    test.ok(privat.$isClass(Privat));
+    test.ok(!privat.$isClass(Class));
 
     test.done();
   },
 
   testInheritance: function (test){
-    test.expect(15);
+    test.expect(16);
 
-    test.ok(animal.instanceOf(Animal));
-    test.ok(animal.instanceOf(Class));
-    test.ok(!animal.instanceOf(Bird));
+    test.ok(animal.$instanceOf(Animal));
+    test.ok(animal.$instanceOf(Class));
+    test.ok(!animal.$instanceOf(Bird));
 
-    test.ok(bird.instanceOf(Bird));
-    test.ok(bird.instanceOf(Animal));
-    test.ok(bird.instanceOf(Class));
+    test.ok(bird.$instanceOf(Bird));
+    test.ok(bird.$instanceOf(Animal));
+    test.ok(bird.$instanceOf(Class));
 
-    test.ok(dog.instanceOf(Dog));
-    test.ok(dog.instanceOf(Class));
-    test.ok(!dog.instanceOf(Animal));
-    test.ok(!dog.instanceOf(Bird));
+    test.ok(dog.$instanceOf(Dog));
+    test.ok(dog.$instanceOf(Class));
+    test.ok(dog.$instanceOf(Animal));
+    test.ok(!dog.$instanceOf(Bird));
 
-    test.ok(beagle.instanceOf(Beagle));
-    test.ok(beagle.instanceOf(Class));
-    test.ok(!beagle.instanceOf(Dog));
-    test.ok(!beagle.instanceOf(Animal));
-    test.ok(!beagle.instanceOf(Bird));
+    test.ok(beagle.$instanceOf(Beagle));
+    test.ok(beagle.$instanceOf(Class));
+    test.ok(!beagle.$instanceOf(Dog));
+    test.ok(!beagle.$instanceOf(Animal));
+    test.ok(!beagle.$instanceOf(Bird));
+    test.ok(!beagle.$instanceOf(Color));
 
     test.done();
   },
@@ -169,58 +289,82 @@ module.exports = testCase({
   testClassNames: function (test){
     test.expect(11);
 
-    test.equals(Class.className, 'Class');
-    test.equals(Animal.className, 'Animal');
-    test.equals(Dog.className, 'Dog');
-    test.equals(Beagle.className, 'Beagle');
+    test.equals(Class.$className, 'Class');
+    test.equals(Animal.$className, 'Animal');
+    test.equals(Dog.$className, 'Dog');
+    test.equals(Beagle.$className, 'Beagle');
 
-    test.equals(animal.getClass().className, 'Animal');
-    test.equals(bird.getClass().className, 'Bird');
-    test.equals(bird.getClass().parent.className, 'Animal');
+    test.equals(animal.$getClass().$className, 'Animal');
+    test.equals(bird.$getClass().$className, 'Bird');
+    test.equals(bird.$getClass().$parent.$className, 'Animal');
 
-    test.equals(dog.getClass().className, 'Dog');
-    test.equals(dog.getClass().parent.className, 'Class');
-    test.equals(beagle.getClass().className, 'Beagle');
-    test.equals(beagle.getClass().parent.className, 'Class');
+    test.equals(dog.$getClass().$className, 'Dog');
+    test.equals(dog.$getClass().$parent.$className, 'Animal');
+    test.equals(beagle.$getClass().$className, 'Beagle');
+    test.equals(beagle.$getClass().$parent.$className, 'Class');
 
     test.done();
   },
-
-  testProtectedMethods: function (test){
+  
+  testPrivateAndDataShare: function(test){
+    test.expect(10);
+    
+    test.equals(privat.items().length, 4);
+    test.deepEqual(privat.items(), [1,2,3,4]);
+    privat.push(5);
+    test.deepEqual(privat.items(), [1,2,3,4,5]);
+    privat.reset();
+    test.deepEqual(privat.items(), []);
+    privat.push(6);
+    test.equals(privat.items()[0], 6);
+    test.equals(privat.private, 'yes');
+    test.equals(privat.privateGet(), 'yes');
+    test.equals(Privat.deal(), 0);
+    privat2.push(13);
+    test.equals(privat2.items().length, 2);
+    test.deepEqual(privat.items(), [6,13]);
+      
+    test.done();
+  }, 
+  
+  testUseStrict: function(test){
+    'use strict';
     test.expect(3);
 
-    /* Strict Mode is still not supported in Node.js
-
-     'use strict';
-
-     test.throws(function() {
-     bird.getClass().className = 'trying to modify className';
-     });
-
-     test.throws(function() {
-     Bird.prototype.getClass = function() {};
-     });
-
-     test.throws(function() {
-     Class.prototype.instanceOf = function() {};
-     });
-
+    /* 
      Overriding a non-writable value would throw an error in Strict Mode
      For now it fails silently, so we're just checking that the value can't be changed
-
      */
+    
+    test.throws(function (){
+      bird.$getClass().$className = 'trying to modify className';
+    });
 
-    var temp = bird.getClass().className;
-    bird.getClass().className = 'trying to modify className';
-    test.strictEqual(bird.getClass().className, temp);
+    test.throws(function (){
+      Bird.prototype.$getClass = function (){};
+    });
 
-    temp = Bird.prototype.getClass;
-    Bird.prototype.getClass = function (){};
-    test.strictEqual(Bird.prototype.getClass, temp);
+    test.throws(function (){
+      Class.prototype.$instanceOf = function (){};
+    });
 
-    temp = Class.prototype.instanceOf;
-    Class.prototype.instanceOf = function (){};
-    test.strictEqual(Class.prototype.instanceOf, temp);
+    test.done();
+  },
+  
+  testProtectedMethods: function (test){
+    test.expect(3);
+    
+    var temp = bird.$getClass().$className;
+    bird.$getClass().$className = 'trying to modify className';
+    test.strictEqual(bird.$getClass().$className, temp);
+
+    temp = Bird.prototype.$getClass;
+    Bird.prototype.$getClass = function (){};
+    test.strictEqual(Bird.prototype.$getClass, temp);
+
+    temp = Class.prototype.$instanceOf;
+    Class.prototype.$instanceOf = function (){};
+    test.strictEqual(Class.prototype.$instanceOf, temp);
 
     test.done();
   },
