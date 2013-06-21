@@ -1,6 +1,6 @@
 var
   testCase = require('nodeunit').testCase,
-  Class = require('../class'),
+  Class = require('../es5class'),
   Animal, Bird, Dog, Beagle, Color, Privat, animal, beagle, bird, dog, color, privat, privat2;
 
 module.exports = testCase({
