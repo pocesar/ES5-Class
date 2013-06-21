@@ -31,6 +31,10 @@ __Contributors__
 npm install es5class
 ```
 
+```js
+var Class = require('es5class');
+```
+
 ## Usage
 -----------
 
