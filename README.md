@@ -1,6 +1,8 @@
 # ES5-Class
 =========
 
+[![Build Status](https://travis-ci.org/pocesar/ES5-Class.png?branch=master)](https://travis-ci.org/pocesar/ES5-Class)
+
 A Class object that enables native prototypal inheritance
 
 * Inheritance made easy
