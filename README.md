@@ -73,6 +73,8 @@ ExtraSingleton.implements({
 });
 
 ExtraSingleton.staticHelper() // outputs 'helper'
+Singleton.extra // undefined
+ExtraSingleton /
 ``` 
  
 ### Class inheritance
@@ -100,7 +102,7 @@ Bird.include(function(){
 });
 ```
 
-### Share data between instances
+### Share data between instances (flyweight pattern)
 
 ```js
 var Share = Class.extend('Share', function(){
@@ -116,6 +118,80 @@ var one = Share.create('one'), two = Share.create('two');
 one.append('dub', true); // _data is now {'dub': true}
 two.append('dub', false); // _data is now {'dub': false}
 two.append('bleh', [1,2,3]); // _data is now {'dub': false, 'bleh': [1,2,3]}
+```
+
+### Duck typing (nothing stops you to not using inheritance and decoupling classes)
+
+```js
+var Op = Class.extend('Op', {
+  construct: function (number){
+    this.number = number;
+  },
+  operator : function (number){
+    return number;
+  }
+});
+
+var Mul = Op.extend('Multiply', {
+  operator: function (number){
+    return number * this.number;
+  }
+});
+
+var Div = Op.extend('Divide', {
+  operator: function (number){
+    return number / this.number;
+  }
+});
+
+var Sum = Op.extend('Sum', {
+  operator: function (number){
+    return number + this.number;
+  }
+});
+
+var Operation = Class.extend('Operation', {}, function (){
+  var
+    classes = [],
+    number = 0;
+
+  return {
+    add     : function (clss){
+      for (var i = 0, len = clss.length; i < len; i++) {
+        classes.push(clss[i]);
+      }
+      return this;
+    },
+    number  : function (nmbr){
+      number = nmbr;
+      return this;
+    },
+    result  : function (){
+      var result = number;
+      for (var i = 0, len = classes.length; i < len; i++) {
+        result = classes[i].operator(result);
+        console.log(result);
+      }
+      return result;
+    },
+    onthefly: function (classes){
+      var result = number;
+      for (var i = 0, len = classes.length; i < len; i++) {
+        result = classes[i].operator(result);
+        console.log(result);
+      }
+      return result;
+    }
+  };
+});
+
+var sum = Sum.create(40);
+var mul = Mul.create(50);
+var div = Div.create(20);
+Operation.number(100);
+Operation.add([sum, mul, div]).result(); // result is 350
+var mul2 = Mul.create(30);
+Operation.onthefly([div, sum, mul, mul2]); // result is 67500
 ```
 
 ### Extending a prototype

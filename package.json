@@ -1,6 +1,6 @@
 {
   "name": "es5class",
-  "version": "0.3.1", 
+  "version": "0.3.2", 
   "description": "Prototypal inheritance based on ES5 Object.create and Object.defineProperty for node.js only",
   "repository": {
     "type": "git",
