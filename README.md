@@ -74,7 +74,8 @@ ExtraSingleton.implements({
 
 ExtraSingleton.staticHelper() // outputs 'helper'
 Singleton.extra // undefined
-ExtraSingleton /
+ExtraSingleton.extra // true
+ExtraSingleton.staticVariable // 1
 ``` 
  
 ### Class inheritance
@@ -232,7 +233,7 @@ Dog.run(); // Cat.ran is 20, Dog.ran is 30 and Animal.ran is 10
 Dog.implement({
     run: function(){
         this.ran += 10;
-        this.$parent.run(); // Animal.ran is now 10
+        this.$parent.run(); // Animal.ran is now 20
     }
 });
 
