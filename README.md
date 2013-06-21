@@ -8,13 +8,15 @@ A Class object that enables native prototypal inheritance
 * Works with Node.js and in the browsers that supports ES5 Object and Properties.
 * Instances and classes gets useful methods and properties for reflections and navigation
 * Functions to implement other class methods and include other instance/prototype methods
-* Takes advantage of ES5 non-writable properties to disalbe the possibility of messing up the classes
-
+* Takes advantage of ES5 non-writable properties to disable the possibility of messing up the classes
+* Ability to inherit from multiple classes
+* Can call the the $super method
+* Can create singletons that can be extended, and call $super as well
 
 __Contributors__
 
 * [ShadowCloud](https://github.com/ShadowCloud)
-
+* [pocesar](https://github.com/pocesar)
 
 Usage
 -----
