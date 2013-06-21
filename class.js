@@ -1,88 +1,105 @@
 /**
  * @version 0.1.3
  */
-var Class = {
-  prototype: {
-    init: function (){}
-  },
-  extend   : function (className, include, implement){
-    var object = Object.create(this);
-    object.parent = this;
-    object.prototype = Object.create(this.prototype);
+var
+  hwp = Object.prototype.hasOwnProperty,
+  Class = {
+    prototype: {
+      init: function (){}
+    },
+    extend   : function (className, include, implement){
+      var object = Object.create(this);
 
-    if (!className) {
-      throw new Error("Class name must be specified");
-    }
-    Object.defineProperty(object, "className", {
-      get: function (){
-        return className;
+      Object.defineProperty(object, 'parent', {
+        value: this
+      });
+
+      Object.defineProperty(object, 'prototype', {
+        value: Object.create(this.prototype)
+      });
+
+      if (!className) {
+        throw new Error("Class name must be specified");
       }
-    });
 
-    Object.defineProperty(object.prototype, "getClass", {
-      value: (function (parentClass){
-        return function (){
-          return parentClass;
+      Object.defineProperty(object, "className", {
+        get: function (){
+          return className;
         }
-      }(object))
-    });
+      });
 
-    /*
-     var isStrictSupported = (function () { "use strict"; return !this; })();
-     console.log("Strict Supported: " + isStrictSupported);
-     */
+      Object.defineProperty(object.prototype, "getClass", {
+        value: (function (parentClass){
+          return function (){
+            return parentClass;
+          };
+        })(object)
+      });
 
-    if (include) {
-      object.include(include);
-    }
-    if (implement) {
-      object.implement(implement);
-    }
+      /*
+       var isStrictSupported = (function () { "use strict"; return !this; })();
+       console.log("Strict Supported: " + isStrictSupported);
+       */
 
-    return object;
-  },
-  create   : function (){
-    var instance = Object.create(this.prototype);
-    instance.parent = this.parent.prototype;
-
-    instance.init.apply(instance, arguments);
-    return instance;
-  },
-  include  : function (obj){
-    function functionWrapper(key, obj){
-      return function (){
-        var originalSuper = this._super;
-        this._super = this.parent[key];
-        var ret = obj[key].apply(this, arguments);
-        this._super = originalSuper;
-        return ret;
+      if (include) {
+        object.include(include);
       }
-    }
 
-    for (var key in obj) {
-      if (typeof obj[key] === "function") {
-        this.prototype[key] = functionWrapper(key, obj);
+      if (implement) {
+        object.implement(implement);
       }
-      else {
-        this.prototype[key] = obj[key];
-      }
-    }
 
-    return this;
-  },
-  implement: function (obj){
-    for (var key in obj) {
-      if (key == "prototype") {
-        this.include(obj[key]);
-      }
-      else {
-        this[key] = obj[key];
-      }
-    }
+      return object;
+    },
+    create   : function (){
+      var instance = Object.create(this.prototype);
 
-    return this;
-  }
-};
+      Object.defineProperty(instance, 'parent', {
+        value: this.parent.prototype
+      });
+
+      instance.init.apply(instance, arguments);
+      return instance;
+    },
+    include  : function (obj){
+      function functionWrapper(key, obj){
+        return function (){
+          var originalSuper = this._super;
+          this._super = this.parent[key];
+          var ret = obj[key].apply(this, arguments);
+          this._super = originalSuper;
+          return ret;
+        };
+      }
+
+      for (var key in obj) {
+        if (hwp.call(obj, key)) {
+          if (typeof obj[key] === "function") {
+            this.prototype[key] = functionWrapper(key, obj);
+          }
+          else {
+            this.prototype[key] = obj[key];
+          }
+        }
+      }
+
+      return this;
+    },
+    implement: function (obj){
+      for (var key in obj) {
+        if (hwp.call(obj, key)) {
+          if (key === "prototype") {
+            this.include(obj[key]);
+          }
+          else {
+            this[key] = obj[key];
+          }
+        }
+      }
+
+      return this;
+    }
+  };
 
 Object.defineProperty(Class, "className", {
   get: function (){
@@ -102,17 +119,4 @@ Object.defineProperty(Class.prototype, "instanceOf", {
   }
 });
 
-(function (){ // For Node.js & Browser compatibility
-  var root = this;
-  var _ = new Object();
-  var isNode = false;
-  if (typeof module !== 'undefined' && module.exports) {
-    module.exports = Class;
-    root.Class = Class;
-    isNode = true;
-  }
-  else {
-    root.Class = Class;
-  }
-})();
-
+module.exports = Class;

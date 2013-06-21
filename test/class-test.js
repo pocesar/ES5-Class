@@ -20,7 +20,7 @@ module.exports = testCase({
         canFly   : false,
         increment: function (){
           var parent = this;
-          while (parent && parent.getClass && parent.getClass().count != null) {
+          while (parent && parent.getClass && parent.getClass().count !== null) {
             parent.getClass().count++;
             parent = parent.parent;
           }
@@ -65,7 +65,14 @@ module.exports = testCase({
   },
 
   tearDown: function (done){
-    Class = null, Animal = null, Bird = null, Dog = null, Beagle = null, animal = null, bird = null, dog = null, beagle = null;
+    Animal = null;  
+    Bird = null;  
+    Dog = null;  
+    Beagle = null;  
+    animal = null;  
+    bird = null;  
+    dog = null;  
+    beagle = null;
     done();
   },
 

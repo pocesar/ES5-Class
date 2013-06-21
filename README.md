@@ -1,4 +1,4 @@
-ES5-Class
+# ES5-Class
 =========
 
 A Class object that enables native prototypal inheritance
@@ -18,105 +18,117 @@ __Contributors__
 * [ShadowCloud](https://github.com/ShadowCloud)
 * [pocesar](https://github.com/pocesar)
 
-Usage
------
+## Install
+=========
 
+```
+npm install es5class
+```
 
-__Creating a new class__
+## Usage
+=========
 
-    var Animal = Class.extend(
-        'Animal', // Class Name
-        { // Instance Methods/Properties
-            init: function(name) { // Constructor
-                this.name = name;
-            },
-            getName: function() {
-                return this.name;
-            }
+### Creating a new class
+
+```js
+var Animal = Class.extend(
+    'Animal', // Class Name
+    { // Instance Methods/Properties
+        init: function(name) { // Constructor
+            this.name = name;
         },
-        { // Class Methods/Properties
-            count: 0
+        getName: function() {
+            return this.name;
         }
-    );
+    },
+    { // Class Methods/Properties
+        count: 0
+    }
+);
+```
 
+### Class inheritance
 
-__Class inheritance__
-
-    var Bird = Animal.extend(
-        'Bird ',
-        {
-            init: function(name) {
-                this._super(name); // calls parent class constructor
-            },
-            canFly: true
+```js
+var Bird = Animal.extend(
+    'Bird ',
+    {
+        init: function(name) {
+            this.$super(name); // calls parent class constructor
         },
-        {}
-    );
+        canFly: true
+    },
+    {}
+);
+```
 
+### Extending a prototype
 
-__Extending a prototype__
+```js
+Bird.include(
+    {
+        fly: function() {
+            if(this.canFly) console.log(this.name + " flies!");
+        },
+    }
+);
+```
 
-    Bird.include(
-        {
-            fly: function() {
-                if(this.canFly) console.log(this.name + " flies!");
-            },
-        }
-    );
+### Extending a class
 
+```js
+Animal.implement(
+    {
+        run: function() {
+            for(var i=1; i<=10; i++)
+                console.log(this.name + " run for " + i + " miles!");
+        },
+    }
+);
+```
 
-__Extending a class__
+### Creating an instance
 
-    Animal.implement(
-        {
-            run: function() {
-                for(var i=1; i<=10; i++)
-                    console.log(this.name + " run for " + i + " miles!");
-            },
-        }
-    );
+```js
+var animal = Animal.create("An Animal");
+var bird = Bird.create("A Bird");
+```
 
+### Checking instances
 
-__Creating an instance__
+```js
+animal.instanceOf(Animal); // true
+animal.instanceOf(Bird);   // false
+bird.instanceOf(Animal);   // true
+bird.instanceOf(Bird);     // true
+bird.instanceOf(Class);    // true
+```
 
-    var animal = Animal.create("An Animal");
-    var bird = Bird.create("A Bird");
+### Other useful methods and properties
 
+```js
+Animal.className;                // Animal
+bird.getClass().className        // Bird
+bird.getClass().parent.className // Animal
+bird.parent.getClass().className // Animal
+```
 
-__Checking instances__
+## Running the tests
+=========
 
-    animal.instanceOf(Animal); // true
-    animal.instanceOf(Bird);   // false
-    bird.instanceOf(Animal);   // true
-    bird.instanceOf(Bird);     // true
-    bird.instanceOf(Class);    // true
+The tests are ran using [nodeunit](https://github.com/caolan/nodeunit)
 
+```
+npm install && npm test
+```
 
-__Other useful methods and properties__
-
-    Animal.className;                // Animal
-    bird.getClass().className        // Bird
-    bird.getClass().parent.className // Animal
-    bird.parent.getClass().className // Animal
-
-
-Running the tests
------------------
-
-The tests can be run using [nodeunit](https://github.com/caolan/nodeunit)
-
-    npm install nodeunit
-    nodeunit test/class-test.js
-
-
-Feeback
--------
+## Feeback
+=========
 
 Please use the issues section of github to report any bug you may find
 
-
-License
--------
+## License
+=========
 
 (The MIT License)
 
