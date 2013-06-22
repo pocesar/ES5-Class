@@ -1,14 +1,44 @@
 /**
- * @version 0.3.3
+ * @version 0.3.4
  */
 var
   hwp = Object.prototype.hasOwnProperty,
+  noop = function(){},
   isArray = function (obj){
     return obj && Object.prototype.toString.call(obj) === '[object Array]';
   },
+  isFunction = function(obj){
+    return obj && (typeof obj === 'function');
+  },
+  functionWrapper = function (key, obj, type, original){
+    return function (){
+      var originalSuper, ret = void 0;
+      /* 
+       * obj[key] = the calling function
+       * this = this closure
+       */
+      switch (type) {
+        case IMPLEMENT:
+          originalSuper = this.$super; 
+          this.$super = original;
+          ret = obj[key].apply(this, arguments);
+          this.$super = originalSuper;
+          break;
+        case INCLUDE:
+          originalSuper = this.$super;
+          this.$super = this.$parent[key];
+          ret = obj[key].apply(this, arguments);
+          this.$super = originalSuper;
+          break;
+      }
+      return ret;
+    };
+  },
+  IMPLEMENT = 'implement',
+  INCLUDE = 'include',
   Class = {
     prototype: {
-      construct: function (){}
+      construct: noop
     },
     extend   : function (className, include, implement){
       var object = Object.create(this);
@@ -36,10 +66,10 @@ var
       });
 
       if (!className) {
-        throw new Error("Class name must be specified");
+        throw new Error('Class name must be specified');
       }
 
-      Object.defineProperty(object, "$className", {
+      Object.defineProperty(object, '$className', {
         get: (function (className){
           return function (){
             return className;
@@ -47,14 +77,14 @@ var
         })(className)
       });
 
-      Object.defineProperty(object.prototype, "$getClass", {
+      Object.defineProperty(object.prototype, '$getClass', {
         value: (function (Class){
           return function (){
             return Class;
           };
         })(object)
       });
-      
+
       var isClass = (function (object){
         return function (cls){
           return cls && cls.$className &&
@@ -63,13 +93,13 @@ var
             cls.prototype === object.prototype;
         };
       })(object);
-      
-      Object.defineProperty(object, "$isClass", {
-        value       : isClass
+
+      Object.defineProperty(object, '$isClass', {
+        value: isClass
       });
-      
-      Object.defineProperty(object.prototype, "$isClass", {
-        value       : isClass
+
+      Object.defineProperty(object.prototype, '$isClass', {
+        value: isClass
       });
 
       if (include) {
@@ -93,34 +123,26 @@ var
       return instance;
     },
     include  : function (obj){
-      function functionWrapper(key, obj){
-        return function (){
-          var originalSuper = this.$super;
-          this.$super = this.$parent[key];
-          var ret = obj[key].apply(this, arguments);
-          this.$super = originalSuper;
-          return ret;
-        };
-      }
-
+      var self = this;
+      
       if (typeof obj !== 'undefined') {
         if (isArray(obj)) {
           for (var i = 0, len = obj.length; i < len; i++) {
-            this.include(obj[i]);
+            self.include(obj[i]);
           }
-        } else if (typeof obj === 'function') {
-          this.include(obj());
+        } else if (isFunction(obj)) {
+          self.include(obj());
         } else {
           for (var key in obj) {
             if (hwp.call(obj, key)) {
-              if (typeof obj[key] === "function") {
-                Object.defineProperty(this.prototype, key, {
+              if (isFunction(obj[key])) {
+                Object.defineProperty(self.prototype, key, {
                   configurable: true,
                   enumerable  : true,
-                  value       : functionWrapper(key, obj)
+                  value       : functionWrapper(key, obj, INCLUDE)
                 });
               } else {
-                Object.defineProperty(this.prototype, key, {
+                Object.defineProperty(self.prototype, key, {
                   enumerable: true,
                   writable  : true,
                   value     : obj[key]
@@ -134,28 +156,40 @@ var
       return this;
     },
     implement: function (obj){
+      var self = this, func;
+      
       if (isArray(obj)) {
         for (var i = 0, len = obj.length; i < len; i++) {
-          this.implement(obj[i]);
+          self.implement(obj[i]);
         }
-      } else if (typeof obj === 'function') {
-        this.implement(obj());
+      } else if (isFunction(obj)) {
+        self.implement(obj());
       } else {
         if (obj.$isClass && obj.$implements) {
-          this.$implements.push(obj);
+          self.$implements.push(obj);
         }
-        
+
         for (var key in obj) {
           if (hwp.call(obj, key)) {
-            if (key === "prototype") {
-              this.include(obj[key]);
+            if (key === 'prototype') {
+              self.include(obj[key]);
             } else {
-              Object.defineProperty(this, key, {
-                enumerable: true,
-                writable  : true,
-                configurable: true,
-                value     : obj[key]
-              });
+              if (isFunction(obj[key])) {
+                func = functionWrapper(key, obj, IMPLEMENT, isFunction(self[key]) ? self[key] : noop);
+                
+                Object.defineProperty(self, key, {
+                  configurable: true,
+                  enumerable  : true,
+                  value       : func
+                });
+              } else {
+                Object.defineProperty(self, key, {
+                  enumerable  : true,
+                  writable    : true,
+                  configurable: true,
+                  value     : obj[key]
+                });
+              }
             }
           }
         }
@@ -165,19 +199,19 @@ var
     }
   };
 
-Object.defineProperty(Class, "$className", {
+Object.defineProperty(Class, '$className', {
   get: function (){
-    return "Class";
+    return 'Class';
   }
 });
 
-Object.defineProperty(Class.prototype, "$getClass", {
+Object.defineProperty(Class.prototype, '$getClass', {
   value: function (){
     return Class;
   }
 });
 
-Object.defineProperty(Class.prototype, "$instanceOf", {
+Object.defineProperty(Class.prototype, '$instanceOf', {
   configurable: true,
   value       : function (object){
     return object && object.prototype && object.prototype.isPrototypeOf ? object.prototype.isPrototypeOf(this) : false;

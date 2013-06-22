@@ -30,7 +30,7 @@ module.exports = testCase({
         run: function (){
           for (var i = 1; i <= 10; i++) {
             this.ran++;
-            console.log("It ran for " + i + " miles!");
+            console.log('It ran for ' + i + ' miles!');
           }
         },
         ran: 0
@@ -229,6 +229,49 @@ module.exports = testCase({
     test.equals(Operation.add([sum, mul, div]).result(), 350);
     var mul2 = Mul.create(30);
     test.equals(Operation.onthefly([div, sum, mul, mul2]), 67500);
+    
+    test.done();
+  },
+  
+  testSingleton: function (test){
+    test.expect(6);
+    
+    var Test = Class.extend('Test', {}, {
+      test: function(){
+        return 'Test::test';
+      }
+    });
+    
+    test.equals(Test.test(), 'Test::test');
+
+    Test.implement({
+      test: function(){
+        return 'New::' + this.$super();
+      }
+    });
+    
+    test.equals(Test.test(), 'New::Test::test');
+
+    Test.implement({
+      test: function(){
+        return 'And::' + this.$super();
+      }
+    });
+
+    test.equals(Test.test(), 'And::New::Test::test');
+    
+    var NewTest = Test.extend('NewTest');
+
+    test.equals(NewTest.test(), 'And::New::Test::test');
+    
+    NewTest.implement({
+      test: function(){
+        return 'NewTest::' + this.$super();
+      }
+    });
+    
+    test.equals(Test.test(), 'And::New::Test::test');
+    test.equals(NewTest.test(), 'NewTest::And::New::Test::test');
     
     test.done();
   },
