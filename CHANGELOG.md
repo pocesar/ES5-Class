@@ -1,3 +1,7 @@
+## 0.4.2
+
+* Minor `README.md` modification and added `keywords`
+
 ## 0.4.1
 
 * Moar performance increases on `$super` functionWrapper according to this [jsperf](http://jsperf.com/regex-external-vs-inline/2)

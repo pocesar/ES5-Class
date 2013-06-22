@@ -1,5 +1,5 @@
 /**
- * @version 0.4.1
+ * @version 0.4.2
  */
 var
   hwp = Object.prototype.hasOwnProperty,

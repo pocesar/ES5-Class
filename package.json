@@ -1,7 +1,18 @@
 {
   "name": "es5class",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "description": "Prototypal inheritance based on ES5 Object.create and Object.defineProperty for node.js only",
+  "keywords" : [
+    "es5",
+    "class",
+    "inheritance",
+    "super",
+    "singleton",
+    "method",
+    "prototypal",
+    "object.create",
+    "object.defineProperty"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/pocesar/ES5-Class.git"

@@ -37,6 +37,14 @@ npm install es5class
 var Class = require('es5class');
 ```
 
+## Support it
+
+Like this module? Star it in github and do in your command line
+
+```js
+npm star es5class
+```
+
 ## Usage
 -----------
 
