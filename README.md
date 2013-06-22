@@ -1,9 +1,10 @@
-# ES5-Class
-=========
-
 [![Build Status](https://travis-ci.org/pocesar/ES5-Class.png?branch=master)](https://travis-ci.org/pocesar/ES5-Class)
 
+# ES5-Class
+-----------
+
 A Class object that enables native prototypal inheritance
+
 Why should we write code like if we were in 2010? Read on!
 
 * Inheritance made easy

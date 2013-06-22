@@ -1,5 +1,5 @@
 /**
- * @version 0.3.4
+ * @version 0.3.5
  */
 var
   hwp = Object.prototype.hasOwnProperty,
@@ -10,32 +10,18 @@ var
   isFunction = function(obj){
     return obj && (typeof obj === 'function');
   },
-  functionWrapper = function (key, obj, type, original){
+  functionWrapper = function (key, obj, original){
     return function (){
-      var originalSuper, ret = void 0;
-      /* 
-       * obj[key] = the calling function
-       * this = this closure
-       */
-      switch (type) {
-        case IMPLEMENT:
-          originalSuper = this.$super; 
-          this.$super = original;
-          ret = obj[key].apply(this, arguments);
-          this.$super = originalSuper;
-          break;
-        case INCLUDE:
-          originalSuper = this.$super;
-          this.$super = this.$parent[key];
-          ret = obj[key].apply(this, arguments);
-          this.$super = originalSuper;
-          break;
-      }
+      var originalSuper, ret;
+      
+      originalSuper = this.$super;
+      this.$super = original || this.$parent[key];
+      ret = obj[key].apply(this, arguments);
+      this.$super = originalSuper;
+      
       return ret;
     };
   },
-  IMPLEMENT = 'implement',
-  INCLUDE = 'include',
   Class = {
     prototype: {
       construct: noop
@@ -139,7 +125,7 @@ var
                 Object.defineProperty(self.prototype, key, {
                   configurable: true,
                   enumerable  : true,
-                  value       : functionWrapper(key, obj, INCLUDE)
+                  value       : functionWrapper(key, obj)
                 });
               } else {
                 Object.defineProperty(self.prototype, key, {
@@ -175,7 +161,7 @@ var
               self.include(obj[key]);
             } else {
               if (isFunction(obj[key])) {
-                func = functionWrapper(key, obj, IMPLEMENT, isFunction(self[key]) ? self[key] : noop);
+                func = functionWrapper(key, obj, isFunction(self[key]) ? self[key] : noop);
                 
                 Object.defineProperty(self, key, {
                   configurable: true,
