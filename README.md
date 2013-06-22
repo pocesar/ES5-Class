@@ -4,6 +4,7 @@
 [![Build Status](https://travis-ci.org/pocesar/ES5-Class.png?branch=master)](https://travis-ci.org/pocesar/ES5-Class)
 
 A Class object that enables native prototypal inheritance
+Why should we write code like if we were in 2010? Read on!
 
 * Inheritance made easy
 * Uses Object.create ES5 method to enable native prototypal inheritance with proper settings (enumerable, configurable, writable)
@@ -15,6 +16,7 @@ A Class object that enables native prototypal inheritance
 * Call `this.$super` to reach the parent instance class function 
 * Call `this.$parent` to reach the parent class method 
 * Inject mixin code (as plain objects, functions or other classes) using `include`
+* Extend static class methods and properties with `implement`
 * `$implements` property contain all classes or objects that were implemented into the class
 * Access the first parent using `$parent`
 * The `construct` method is called with arguments when the class is instantiated
@@ -71,8 +73,8 @@ var Singleton = Class.extend('Singleton', {}, {
 });
 
 var ExtraSingleton = Class.extend('Extra');
-ExtraSingleton.implements(Singleton);
-ExtraSingleton.implements({
+ExtraSingleton.implement(Singleton);
+ExtraSingleton.implement({
     extra: true
 });
 
