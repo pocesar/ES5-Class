@@ -1,5 +1,5 @@
 /**
- * @version 0.4.0
+ * @version 0.4.1
  */
 var
   hwp = Object.prototype.hasOwnProperty,
@@ -10,17 +10,21 @@ var
   isFunction = function(obj){
     return obj && (typeof obj === 'function');
   },
+  hasSuperRegex = /\$super\(/,
   functionWrapper = function (key, obj, original){
-    if (!/\$super\(/.test(obj[key])) { 
-      /* 
-        inject $super only when needed
-        
-        performance gain:
-        476% on Class method calls
-        40% on more than 1 level $super calls
-        120% on instance and method $super calls
-        42% on instance calls
-      */
+    /* 
+     performance gain:
+     476% on Class method calls
+     40% on more than 1 level $super calls
+     120% on instance and method $super calls
+     42% on instance calls
+
+     this function call happens only once when creating the class
+     but the wrapper calls 2 functions instead of one
+     so only wrap it when needed
+     */
+    
+    if (!hasSuperRegex.test(obj[key])) { 
       return obj[key];
     }
     return function (){

@@ -8,7 +8,7 @@ A Class object that enables native prototypal inheritance
 Why should we write code like if we were in 2010? Read on!
 
 * Inheritance made easy
-* Uses Object.create ES5 method to enable native prototypal inheritance with proper settings (enumerable, configurable, writable)
+* Uses Object.create and Object.defineProperty ES5 methods to enable native prototypal inheritance with proper settings (enumerable, configurable, writable)
 * Works with Node.js 0.8.x and up.
 * Instances and classes gets useful methods and properties for reflections and navigation
 * Functions to implement other class methods and include other instance/prototype methods
