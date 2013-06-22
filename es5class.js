@@ -1,5 +1,5 @@
 /**
- * @version 0.3.5
+ * @version 0.4.0
  */
 var
   hwp = Object.prototype.hasOwnProperty,
@@ -11,13 +11,26 @@ var
     return obj && (typeof obj === 'function');
   },
   functionWrapper = function (key, obj, original){
+    if (!/\$super\(/.test(obj[key])) { 
+      /* 
+        inject $super only when needed
+        
+        performance gain:
+        476% on Class method calls
+        40% on more than 1 level $super calls
+        120% on instance and method $super calls
+        42% on instance calls
+      */
+      return obj[key];
+    }
     return function (){
       var originalSuper, ret;
       
       originalSuper = this.$super;
-      this.$super = original || this.$parent[key];
+      // if we have an original, it's a Class method call, otherwise, let's look for the parent
+      this.$super = original || this.$parent[key]; 
       ret = obj[key].apply(this, arguments);
-      this.$super = originalSuper;
+      this.$super = originalSuper; // restore the upper $super
       
       return ret;
     };
