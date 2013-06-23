@@ -2,7 +2,7 @@ var
   Benchmark = require('Benchmark'),
   suite = new Benchmark.Suite,
   util = require('util'),
-  Class = require('../es5class'),
+  Class = require('../'),
   base = {
     'args'      : {'Class': Class},
     'onComplete': function (event){

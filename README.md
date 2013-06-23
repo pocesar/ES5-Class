@@ -31,9 +31,7 @@ __Contributors__
 
 ```
 npm install es5class
-```
-
-```js
+// then in your code
 var Class = require('es5class');
 ```
 

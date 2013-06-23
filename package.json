@@ -1,17 +1,19 @@
 {
   "name": "es5class",
-  "version": "0.4.2",
+  "version": "0.5.0",
   "description": "Prototypal inheritance based on ES5 Object.create and Object.defineProperty for node.js only",
   "keywords" : [
     "es5",
     "class",
     "inheritance",
     "super",
+    "parent",
     "singleton",
     "method",
     "prototypal",
     "object.create",
-    "object.defineProperty"
+    "object.defineProperty",
+    "prototype"
   ],
   "repository": {
     "type": "git",
@@ -27,6 +29,6 @@
     "benchmark": "~1.0.0"
   },
   "scripts": {
-    "test": "jshint es5class.js test/class-test.js && nodeunit test/class-test.js"
+    "test": "jshint index.js test/class-test.js && nodeunit test/class-test.js"
   }
 }

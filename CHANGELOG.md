@@ -1,3 +1,7 @@
+## 0.5.0
+
+* Changed library to `index.js`, since not using `lib` folder or `main` in `package.json`
+
 ## 0.4.2
 
 * Minor `README.md` modification and added `keywords`
