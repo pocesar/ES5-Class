@@ -1,4 +1,4 @@
-## 0.5.1
+## 0.6.0
 
 * Renamed class inside file to `ES5Class` for obvious reasons
 * Changed `extend` to `define` (makes more sense)
