@@ -1,11 +1,6 @@
 /**
  * @version 0.6.0
  */
-/*var util = require('util');
-
-var log = function(obj){
-  console.log(util.inspect(obj, { showHidden: true, depth: 2 }));
-};*/
 
 var
   _hwp = Object.prototype.hasOwnProperty,
@@ -16,7 +11,7 @@ var
   _isFunction = function (obj){
     return obj && (typeof obj === 'function');
   },
-  _hasSuperRegex = /\$super\(/,
+  _hasSuperRegex = /\$super/,
   _functionWrapper = function (key, obj, original){
     /* 
      performance gain:
@@ -34,18 +29,15 @@ var
       return obj[key];
     }
     return function (){
-      var originalSuper = false, ret, self = this;
+      var originalSuper, ret, self = this;
 
-      if (self.$super) {
-        originalSuper = self.$super;
-      }
+      originalSuper = self.$super;
+      
       // if we have an original, it's a Class method call, otherwise, let's look for the parent
-      self.$super = original || self.$parent[key] || _noop();
+      self.$super = original || self.$parent[key] || _noop;
       ret = obj[key].apply(self, arguments);
 
-      if (originalSuper) {
-        self.$super = originalSuper; // restore the upper $super
-      }
+      self.$super = originalSuper; // restore the upper $super
 
       return ret;
     };
@@ -54,33 +46,6 @@ var
     prototype: {
       construct: _noop
     },
-    extend   : function (className, include, implement){
-      var
-        self = this;
-
-      if (typeof self === 'undefined') {
-        return ES5Class.define(className, include, implement);
-      }
-      
-      Object.defineProperty(self, '$className', {
-        configurable: true,
-        get: (function (className){
-          return function (){
-            return className;
-          };
-        })(className)
-      });
-
-      if (include) {
-        self.include(include);
-      }
-
-      if (implement) {
-        self.implement(implement);
-      }
-
-      return self;
-    },
     define   : function (className, include, implement){
       var
         self = this, object;
@@ -88,25 +53,28 @@ var
       if (!className) {
         throw new Error('Class name must be specified');
       }
-      
-      object = Object.create(self);
-      
-      Object.defineProperties(object, {
+
+      object = Object.create(self, {
+        '$className' : {
+          get: (function (className){
+            return function (){
+              return className;
+            };
+          })(className)
+        },
         '$parent'    : {
-          configurable: true,
-          value: (function(obj){
+          value: (function (obj){
             return obj;
           })(self)
         },
-        'prototype'  : {
-          configurable: true,
-          value: (function(obj){
-            return Object.create(obj.prototype);
-          })(object)
-        },
         '$implements': {
-          value     : [],
-          writable  : true
+          value   : [],
+          writable: true
+        },
+        'prototype'  : {
+          value: (function (obj){
+            return Object.create(obj.prototype);
+          })(self)
         }
       });
 
@@ -120,7 +88,7 @@ var
 
       Object.defineProperty(object.prototype, '$getClass', {
         configurable: true,
-        value: (function (Class){
+        value       : (function (Class){
           return function (){
             return Class;
           };
@@ -138,29 +106,38 @@ var
       })(object);
 
       Object.defineProperty(object, '$isClass', {
-        configurable: true,
         value: isClass
       });
 
       Object.defineProperty(object.prototype, '$isClass', {
-        configurable: true,
         value: isClass
       });
 
-      return ES5Class.extend.call(object, className, include, implement);
+      if (include) {
+        object.include(include);
+      }
+
+      if (implement) {
+        object.implement(implement);
+      }
+
+      return object;
     },
     create   : function (){
-      var instance = Object.create(this.prototype);
+      var
+        self = this,
+        instance = Object.create(self.prototype);
 
       Object.defineProperty(instance, '$parent', {
         value: this.$parent.prototype
       });
 
       instance.construct.apply(instance, arguments);
+
       return instance;
     },
     include  : function (obj){
-      var self = this;
+      var self = this, wrap;
 
       if (typeof obj !== 'undefined') {
         if (_isArray(obj)) {
@@ -173,10 +150,12 @@ var
           for (var key in obj) {
             if (_hwp.call(obj, key)) {
               if (_isFunction(obj[key])) {
+                wrap = _functionWrapper(key, obj, _isFunction(self.prototype[key]) ? self.prototype[key] : _noop);
+                
                 Object.defineProperty(self.prototype, key, {
                   configurable: true,
                   enumerable  : true,
-                  value       : _functionWrapper(key, obj)
+                  value       : wrap
                 });
               } else {
                 Object.defineProperty(self.prototype, key, {
@@ -190,7 +169,7 @@ var
         }
       }
 
-      return this;
+      return self;
     },
     implement: function (obj){
       var self = this, func;
@@ -237,22 +216,19 @@ var
   };
 
 Object.defineProperty(ES5Class, '$className', {
-  configurable: true,
   get: function (){
     return 'ES5Class';
   }
 });
 
 Object.defineProperty(ES5Class.prototype, '$getClass', {
-  configurable: true,
   value: function (){
     return ES5Class;
   }
 });
 
 Object.defineProperty(ES5Class.prototype, '$instanceOf', {
-  configurable: true,
-  value       : function (object){
+  value: function (object){
     return object && object.prototype && object.prototype.isPrototypeOf ? object.prototype.isPrototypeOf(this) : false;
   }
 });

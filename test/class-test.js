@@ -18,8 +18,7 @@ module.exports = {
         canFly   : false,
         increment: function (){
           var parent = this;
-          console.log(this);
-          while (parent && parent.$getClass && parent.$getClass().count !== null) {
+          while (parent && parent.$getClass && parent.$getClass().count >= 0) {
             parent.$getClass().count++;
             parent = parent.$parent;
           }
@@ -38,7 +37,7 @@ module.exports = {
       }
     );
 
-    Bird = Animal.extend(
+    Bird = Animal.define(
       'Bird',
       {
         construct: function (name){
@@ -59,14 +58,13 @@ module.exports = {
       color: 'brown'
     });
 
-    Dog = Animal.extend('Dog', {
+    Dog = Animal.define('Dog', {
       construct: function (name){
         this.name = name;
       }
     }, {
       run: function (){
         this.ran += 20;
-        //this.$parent.run();
       }
     });
 
@@ -83,7 +81,7 @@ module.exports = {
       Color
     ]);
 
-    Beagle = Class.define('Beagle', {}, {});
+    Beagle = Animal.define('Beagle');
     Beagle.implement([Dog, Color]);
     Beagle.include({
       construct: function (name){
@@ -141,7 +139,10 @@ module.exports = {
     bird = Bird.create('A Bird');
     dog = Dog.create('A Dog');
     beagle = Beagle.create('A Beagle');
-    color = Color.create('A color');
+    
+    color = Color.create();
+    color.setColor('A color');
+    
     privat = Privat.create([1, 2, 3, 4]);
     privat2 = Privat.create();
   },
@@ -172,19 +173,19 @@ module.exports = {
         }
       });
 
-      var Mul = Op.extend('Multiply', {
+      var Mul = Op.define('Multiply', {
         operator: function (number){
           return number * this.number;
         }
       });
 
-      var Div = Op.extend('Divide', {
+      var Div = Op.define('Divide', {
         operator: function (number){
           return number / this.number;
         }
       });
 
-      var Sum = Op.extend('Sum', {
+      var Sum = Op.define('Sum', {
         operator: function (number){
           return number + this.number;
         }
@@ -258,7 +259,7 @@ module.exports = {
 
       expect(Test.test()).to.equal('And::New::Test::test');
 
-      var NewTest = Test.extend('NewTest');
+      var NewTest = Test.define('NewTest');
 
       expect(NewTest.test()).to.equal('And::New::Test::test');
 
@@ -286,23 +287,30 @@ module.exports = {
         }
       });
 
-      var ES5FrenchGuy = ES5Person.extend('ES5FrenchGuy', {
+      var ES5FrenchGuy = ES5Person.define('ES5FrenchGuy', {
         setAddress: function (city, street){
+          //console.log(this.$super.toString(), city, street);
           this.$super('France', city, street);
         }
       });
 
-      var ES5ParisLover = ES5FrenchGuy.extend('ES5ParisLover', {
+      var ES5ParisLover = ES5FrenchGuy.define('ES5ParisLover', {
         setAddress: function (street){
+          //console.log(this.$super.toString(), street);
           this.$super('Paris', street);
         }
       });
 
       var p40 = ES5ParisLover.create('Mary');
+
+      expect(p40.setAddress).to.be.a('function');
+      
       p40.setAddress('CH');
 
-      expect(p40.setAddress).to.be.ok();
-      expect(p40.street).to.equal('CH');
+      expect(p40.name).to.be('Mary');
+      expect(p40.street).to.be('CH');
+      expect(p40.city).to.be('Paris');
+      expect(p40.country).to.be('France');
 
     },
 
@@ -335,17 +343,17 @@ module.exports = {
     testClassProperties: function (){
 
       expect(Animal.count).to.equal(2);
-      expect(Animal.$implements).to.deep.equal([]);
+      expect(Animal.$implements).to.eql([]);
 
       expect(Bird.count).to.equal(1);
       expect(Dog.isBig).to.equal(true);
       expect(Beagle.isBig).to.equal(false);
       expect(Beagle.color).to.equal('brown');
 
-      expect(!Beagle.count).to.be.ok();
+      expect(Beagle.count).to.be.ok();
 
-      expect(!Beagle.$implements[0].$isClass(Bird)).to.be.ok();
-      expect(!Beagle.$implements[0].$isClass(Animal)).to.be.ok();
+      expect(Beagle.$implements[0].$isClass(Bird)).not.to.be.ok();
+      expect(Beagle.$implements[0].$isClass(Animal)).not.to.be.ok();
       expect(Beagle.$implements[0].$isClass(Dog)).to.be.ok();
       expect(Beagle.$implements[1].$isClass(Color)).to.be.ok();
 
@@ -354,7 +362,7 @@ module.exports = {
     testInstanceProperties: function (){
 
       expect(animal.name).to.equal('An Animal');
-      expect(animal.$implements).to.deep.equal([]);
+      expect(animal.$implements).to.eql([]);
       
       expect(bird.name).to.equal('A Bird');
       expect(animal.canFly).to.equal(false);
@@ -363,6 +371,7 @@ module.exports = {
       expect(dog.name).to.equal('A Dog');
       expect(Dog.color).to.equal('brown');
       expect(beagle.name).to.equal('A Beagle');
+      expect(color.color).to.equal('A color');
       expect(beagle.color).to.equal('white and brown');
 
       expect(beagle.$implements[0].$isClass(Dog)).to.be.ok();
@@ -380,9 +389,9 @@ module.exports = {
     testIsClass: function (){
 
       expect(animal.$isClass(Animal)).to.be.ok();
-      expect(!animal.$isClass(Class)).to.be.ok();
+      expect(animal.$isClass(Class)).not.to.be.ok();
       expect(privat.$isClass(Privat)).to.be.ok();
-      expect(!privat.$isClass(Class)).to.be.ok();
+      expect(privat.$isClass(Class)).not.to.be.ok();
 
     },
 
@@ -390,7 +399,7 @@ module.exports = {
 
       expect(animal.$instanceOf(Animal)).to.be.ok();
       expect(animal.$instanceOf(Class)).to.be.ok();
-      expect(!animal.$instanceOf(Bird)).to.be.ok();
+      expect(animal.$instanceOf(Bird)).not.to.be.ok();
 
       expect(bird.$instanceOf(Bird)).to.be.ok();
       expect(bird.$instanceOf(Animal)).to.be.ok();
@@ -399,14 +408,14 @@ module.exports = {
       expect(dog.$instanceOf(Dog)).to.be.ok();
       expect(dog.$instanceOf(Class)).to.be.ok();
       expect(dog.$instanceOf(Animal)).to.be.ok();
-      expect(!dog.$instanceOf(Bird)).to.be.ok();
+      expect(dog.$instanceOf(Bird)).not.to.be.ok();
 
       expect(beagle.$instanceOf(Beagle)).to.be.ok();
       expect(beagle.$instanceOf(Class)).to.be.ok();
-      expect(!beagle.$instanceOf(Dog)).to.be.ok();
-      expect(!beagle.$instanceOf(Animal)).to.be.ok();
-      expect(!beagle.$instanceOf(Bird)).to.be.ok();
-      expect(!beagle.$instanceOf(Color)).to.be.ok();
+      expect(beagle.$instanceOf(Dog)).not.to.be.ok();
+      expect(beagle.$instanceOf(Animal)).to.be.ok();
+      expect(beagle.$instanceOf(Bird)).not.to.be.ok();
+      expect(beagle.$instanceOf(Color)).not.to.be.ok();
 
     },
 
@@ -431,26 +440,34 @@ module.exports = {
       expect(dog.$getClass().$className).to.equal('Dog');
       expect(dog.$getClass().$parent.$className).to.equal('Animal');
       expect(beagle.$getClass().$className).to.equal('Beagle');
-      expect(beagle.$getClass().$parent.$getClass().$parent.$className).to.equal('ES5Class');
+      expect(beagle.$getClass().$parent.$className).to.equal('Animal');
 
     },
 
     testPrivateAndDataShare: function (){
 
       expect(privat.items().length).to.equal(4);
-      expect(privat.items()).to.deep.equal([1, 2, 3, 4]);
+      expect(privat.items()).to.eql([1, 2, 3, 4]);
+      
       privat.push(5);
-      expect(privat.items()).to.deep.equal([1, 2, 3, 4, 5]);
+      
+      expect(privat.items()).to.eql([1, 2, 3, 4, 5]);
+      
       privat.reset();
-      expect(privat.items()).to.deep.equal([]);
+     
+      expect(privat.items()).to.eql([]);
+      
       privat.push(6);
-      expect(privat.items()[0]).to.equal( 6);
+      
+      expect(privat.items()[0]).to.equal(6);
       expect(privat.private).to.equal('yes');
       expect(privat.privateGet()).to.equal('yes');
       expect(Privat.deal()).to.equal(0);
+      
       privat2.push(13);
+      
       expect(privat2.items().length).to.equal(2);
-      expect(privat.items()).to.deep.equal([6, 13]);
+      expect(privat.items()).to.eql([6, 13]);
 
     },
 
@@ -493,7 +510,7 @@ module.exports = {
     },
 
     testConstructor: function (){
-      expect(typeof Bird).to.not.equal('function');
+      expect(typeof Bird).not.to.be('function');
       expect(Bird.create).to.be.ok();
     }
   }

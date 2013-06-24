@@ -2,9 +2,9 @@
 
 * Renamed class inside file to `ES5Class` for obvious reasons
 * Changed `extend` to `define` (makes more sense)
-* New function `extend` now actually extend the previous class (previous `extend` was getting a `maximum recursion` error)
 * Fixed memory leak on `Object.create`
 * Change `nodeunit` to `mocha`
+* Fixed `Maximum call stack size exceeded` when extending classes
 
 ## 0.5.0
 
