@@ -1,3 +1,11 @@
+## 0.5.1
+
+* Renamed class inside file to `ES5Class` for obvious reasons
+* Changed `extend` to `define` (makes more sense)
+* New function `extend` now actually extend the previous class (previous `extend` was getting a `maximum recursion` error)
+* Fixed memory leak on `Object.create`
+* Change `nodeunit` to `mocha`
+
 ## 0.5.0
 
 * Changed library to `index.js`, since not using `lib` folder or `main` in `package.json`
