@@ -142,7 +142,7 @@ var
       return instance;
     },
     include  : function (obj){
-      var self = this, wrap, props = {};
+      var self = this, wrap;
 
       if (typeof obj !== 'undefined') {
         if (_isArray(obj)) {
@@ -157,24 +157,11 @@ var
               if (_isFunction(obj[key])) {
                 wrap = _functionWrapper(key, obj, _isFunction(self.prototype[key]) ? self.prototype[key] : _noop);
 
-                props[key] = {
-                  configurable: true,
-                  enumerable  : true,
-                  value       : wrap
-                };
+                self.prototype[key] = wrap;
               } else {
-                props[key] = {
-                  enumerable  : true,
-                  writable    : true,
-                  configurable: true,
-                  value       : obj[key]
-                };
+                self.prototype[key] = obj[key];
               }
             }
-          }
-
-          if (Object.getOwnPropertyNames(props).length) {
-            Object.defineProperties(self.prototype, props);
           }
         }
       }
@@ -182,7 +169,7 @@ var
       return self;
     },
     implement: function (obj){
-      var self = this, func, props = {};
+      var self = this, func;
 
       if (_isArray(obj)) {
         for (var i = 0, len = obj.length; i < len; i++) {
@@ -203,26 +190,14 @@ var
               if (_isFunction(obj[key])) {
                 func = _functionWrapper(key, obj, _isFunction(self[key]) ? self[key] : _noop);
 
-                props[key] = {
-                  configurable: true,
-                  enumerable  : true,
-                  value       : func
-                };
+                self[key] = func;
               } else {
-                props[key] = {
-                  enumerable  : true,
-                  writable    : true,
-                  configurable: true,
-                  value       : obj[key]
-                };
+                self[key] = obj[key];
               }
             }
           }
         }
 
-        if (Object.getOwnPropertyNames(props).length) {
-          Object.defineProperties(self, props);
-        }
       }
 
       return this;
