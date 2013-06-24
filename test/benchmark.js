@@ -20,7 +20,7 @@ suite
           Cls.create().test();
         },
         setup: function (){
-          var Cls = this.args.Class.extend('cls', {
+          var Cls = this.args.Class.define('cls', {
             'test': function (){
               return true;
             }
@@ -33,7 +33,7 @@ suite
   .add('class method function call',
     util._extend({
         setup: function (){
-          var Cls = this.args.Class.extend('cls');
+          var Cls = this.args.Class.define('cls');
           Cls.implement({
             'test': function (){
               return true;
@@ -50,7 +50,7 @@ suite
   .add('class instance included function call',
     util._extend({
         setup: function (){
-          var Cls = this.args.Class.extend('cls');
+          var Cls = this.args.Class.define('cls');
           Cls.include({
             'test': function (){
               return true;
@@ -67,19 +67,20 @@ suite
   .add('$super instance function calls',
     util._extend({
         setup: function (){
-          var Cls = this.args.Class.extend('cls', {
+          var Cls = this.args.Class.define('cls', {
             test: function (){
               return true;
             }
           });
-          var Clss = Cls.extend('clss', {
+          var Clss = Cls.define('clss', {
             test: function (){
               return this.$super();
             }
           });
         },
         fn   : function (){
-          Clss.create().test();
+          var create = Clss.create();
+          create.test();
         }
       },
       base
@@ -88,7 +89,7 @@ suite
   .add('$super class function calls',
     util._extend({
         setup: function (){
-          var Cls = this.args.Class.extend('cls', {}, {
+          var Cls = this.args.Class.define('cls', {}, {
             test: function (){
               return true;
             }
@@ -110,7 +111,7 @@ suite
   .add('$super inherited two levels deep function calls',
     util._extend({
         setup: function (){
-          var Cls = this.args.Class.extend('cls', {}, {
+          var Cls = this.args.Class.define('cls', {}, {
             test: function (){
               return true;
             }
@@ -120,7 +121,7 @@ suite
               return this.$super();
             }
           });
-          var Two = Cls.extend('Two', {}, {
+          var Two = Cls.define('Two', {}, {
             test: function (){
               return this.$super();
             }
@@ -128,6 +129,23 @@ suite
         },
         fn   : function (){
           Two.test();
+        }
+      },
+      base
+    )
+  )
+  .add('class instantiation', 
+    util._extend({
+        setup: function() {
+          var Cls = this.args.Class.define('cls', {
+            vibrate: function(){
+              return true;
+            }
+          });
+        },
+        fn: function(){
+          var cls = Cls.create();
+          cls.vibrate();
         }
       },
       base

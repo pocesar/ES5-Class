@@ -5,6 +5,7 @@
 * Fixed memory leak on `Object.create`
 * Change `nodeunit` to `mocha`
 * Fixed `Maximum call stack size exceeded` when extending classes
+* When passing a closure to the function, the argument passed is the `$parent` for `implement` and `$parent.prototype` for `include`
 
 ## 0.5.0
 

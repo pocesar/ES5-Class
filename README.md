@@ -20,6 +20,7 @@ Why should we write code like if we were in 2010? Read on!
 * Extend static class methods and properties with `implement`
 * `$implements` property contain all classes or objects that were implemented into the class
 * The `construct` method is called with arguments when the class is instantiated
+* `$class` is available everywhere, it returns the current class, even before instantiation
 
 __Contributors__
 
@@ -95,7 +96,7 @@ ExtraSingleton.staticVariable // 1
 ```js
 var Bird = Animal.extend('Bird', {
     construct: function(name) {
-        this.$super(name); // calls parent class constructor, calls Animal.construct and set this.name = name
+        this.$super('Yellow ' + name); // calls parent class constructor, calls Animal.construct and set this.name = name
     },
     canFly: true
 });
@@ -104,9 +105,11 @@ var Bird = Animal.extend('Bird', {
 ### Encapsulate logic by passing a closure
 
 ```js
-Bird.include(function(){
+Bird.include(function($super){ // $super is the Animal class prototype, it constains only "construct" and "getName"
     var timesBeaked = 0;
-    
+    // "this" refers to the current Class definition, so you can access static variables plus the prototype
+    // this.prototype.otherfunction();
+    // this.staticvar
     return {
         beak: function(){
             return ++timesBeaked;
@@ -118,15 +121,16 @@ Bird.include(function(){
 ### Share data between instances (flyweight pattern)
 
 ```js
-var Share = Class.extend('Share', function(){
+var Share = Class.extend('Share', function($super){
     var _data = {};
+    this.count++;
     
     return {
         append: function(name, data){
           _data[name] = data;   
         }
     }
-});
+}, {count: 0);
 var one = Share.create('one'), two = Share.create('two');
 one.append('dub', true); // _data is now {'dub': true}
 two.append('dub', false); // _data is now {'dub': false}
