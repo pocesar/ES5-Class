@@ -50,7 +50,7 @@ npm star es5class
 ### Creating a new class
 
 ```js
-var Animal = Class.extend(
+var Animal = Class.define(
     // Class Name
     'Animal', 
     // Instance Methods/Properties, these will only be available through a class instance, through Animal.create('Name')
@@ -72,14 +72,14 @@ var Animal = Class.extend(
 ### Singletons
 
 ```js
-var Singleton = Class.extend('Singleton', {}, {
+var Singleton = Class.define('Singleton', {}, {
     staticHelper: function(){
         return 'helper';
     },
     staticVariable: 1
 });
 
-var ExtraSingleton = Class.extend('Extra');
+var ExtraSingleton = Class.define('Extra');
 ExtraSingleton.implement(Singleton);
 ExtraSingleton.implement({
     extra: true
@@ -94,7 +94,7 @@ ExtraSingleton.staticVariable // 1
 ### Class inheritance
 
 ```js
-var Bird = Animal.extend('Bird', {
+var Bird = Animal.define('Bird', {
     construct: function(name) {
         this.$super('Yellow ' + name); // calls parent class constructor, calls Animal.construct and set this.name = name
     },
@@ -116,12 +116,19 @@ Bird.include(function($super){ // $super is the Animal class prototype, it const
         }
     };
 });
+Bird.implement(function($super){ // $super is the Animal class itself
+    // "this" refers to the current Class definition, the same way it happens when extending the prototype (using include)
+    return {
+        catalog: function(){
+        }
+    };
+});
 ```
 
 ### Share data between instances (flyweight pattern)
 
 ```js
-var Share = Class.extend('Share', function($super){
+var Share = Class.define('Share', function($super){ // $super = ES5Class, the base class
     var _data = {};
     this.count++;
     
@@ -130,7 +137,7 @@ var Share = Class.extend('Share', function($super){
           _data[name] = data;   
         }
     }
-}, {count: 0);
+}, {count: 0});
 var one = Share.create('one'), two = Share.create('two');
 one.append('dub', true); // _data is now {'dub': true}
 two.append('dub', false); // _data is now {'dub': false}
@@ -140,7 +147,7 @@ two.append('bleh', [1,2,3]); // _data is now {'dub': false, 'bleh': [1,2,3]}
 ### Duck typing (nothing stops you to not using inheritance and decoupling classes)
 
 ```js
-var Op = Class.extend('Op', {
+var Op = Class.define('Op', {
   construct: function (number){
     this.number = number;
   },
@@ -149,25 +156,25 @@ var Op = Class.extend('Op', {
   }
 });
 
-var Mul = Op.extend('Multiply', {
+var Mul = Op.define('Multiply', {
   operator: function (number){
     return number * this.number;
   }
 });
 
-var Div = Op.extend('Divide', {
+var Div = Op.define('Divide', {
   operator: function (number){
     return number / this.number;
   }
 });
 
-var Sum = Op.extend('Sum', {
+var Sum = Op.define('Sum', {
   operator: function (number){
     return number + this.number;
   }
 });
 
-var Operation = Class.extend('Operation', {}, function (){
+var Operation = Class.define('Operation', {}, function (){
   var
     classes = [],
     number = 0;
@@ -237,9 +244,9 @@ Animal.implement({
     },
     ran: 0
 }); 
-var Dog = Animal.extend('Dog');
+var Dog = Animal.define('Dog');
 Animal.run(); // Cat.ran, Dog.ran and Animal.ran are 10
-var Cat = Animal.extend('Cat');
+var Cat = Animal.define('Cat');
 Cat.run(); // Cat.ran is 20, Dog.ran and Animal.ran are 10
 Dog.run(); // 
 Dog.run(); // Cat.ran is 20, Dog.ran is 30 and Animal.ran is 10
@@ -277,12 +284,13 @@ bird.$instanceOf(Class);    // true
 
 ```js
 Animal.$className;                // Animal
-bird.$getClass();                   // returns the Bird class definition, you can do a $getClass().create('another instance')
-bird.$getClass().$className        // Bird
-bird.$getClass().$parent.$className // Animal
-bird.$parent.$getClass().$className // Animal
-bird.$isClass(Bird); // true
-Animal.$isClass(Bird); // false
+bird.$class;                      // returns the Bird class definition, you can do a $class().create('another instance')
+bird.$class.$className            // Bird
+bird.$class.$parent.$className    // Animal
+bird.$parent.$className           // Animal
+bird.$parent.$parent.$className   // ES5Class
+bird.$isClass(Bird);              // true
+Animal.$isClass(Bird);            // false
 ```
 
 ## Running the tests

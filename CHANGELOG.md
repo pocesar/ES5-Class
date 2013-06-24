@@ -1,3 +1,7 @@
+## 0.6.1
+
+* Forgot to update `README.md` to the new code
+
 ## 0.6.0
 
 * Renamed class inside file to `ES5Class` for obvious reasons
