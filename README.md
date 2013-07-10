@@ -98,10 +98,10 @@ Bird.include({ // include is like doing _.extend(Bird.prototype, {}) but with pr
 ### Encapsulate logic by passing a closure
 
 ```js
-Bird.include(function($super){ // $super is the Animal prototype (the parent), it constains only "construct" and "getName" per definitions above
+Bird.include(function($super){ // $super is the Animal prototype (the parent), it contains only "construct" and "getName" per definitions above
     var timesBeaked = 0;
     // "this" refers to the current Class definition, that is, Bird, so you can access 
-    // static variables plus the prototype
+    // static variables plus the prototype, before it's [re]defined
     //
     // this.prototype.getName();
     // this.count
@@ -161,12 +161,6 @@ Dog.implement({
 Dog.run(); // Dog.ran is now 40, Animal.ran and Cat.ran are now 20
 ```
 
-### Extend from multiple classes
-
-```js
-
-```
-
 ### Creating an instance
 
 ```js
@@ -195,6 +189,27 @@ bird.$parent.$className           // 'Animal'
 bird.$parent.$parent.$className   // 'ES5Class'
 bird.$isClass(Bird);              // true
 Animal.$isClass(Bird);            // false
+```
+
+### Mixin from other classes
+
+```js
+var Class1 = Class.define('Class1', {}, {done: true}),
+    Class2 = Class.define('Class2', {func: function(){ return true; }}),
+    Class3 = Class.define('Class3', {}, {yet: true});
+
+var NewClass = Class.define('NewClass', {}, [Class1, Class2, Class3]); 
+// Pay attention that it needs to go in the second parameter
+// or using NewClass.implement([Class1, Class2, Class3]);
+
+console.log(NewClass.done); // true
+console.log(NewClass.yet); // true
+console.log(NewClass.$parent); // ES5Class
+console.log(NewClass.$implements); // [Class1,Class2,Class3]
+console.log(NewClass.create().func()); // true
+console.log(NewClass.create().$class.done); // true    
+
+// Changing the base classes doesn't change the mixin'd class
 ```
 
 ### Singletons

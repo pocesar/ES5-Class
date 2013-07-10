@@ -1,5 +1,5 @@
 /**
- * @version 0.6.3
+ * @version 0.6.4
  */
 
 var
@@ -174,7 +174,7 @@ var
         self = this,
         instance = Object.create(self.prototype);
 
-      instance.$parent = this.$parent.prototype;
+      instance.$parent = self.$parent.prototype;
 
       if (instance.construct !== _noop) {
         instance.construct.apply(instance, arguments);
@@ -243,6 +243,8 @@ var
           if (_hwp.call(obj, key)) {
             if (key === 'prototype') {
               self.include(obj[key]);
+            } else if (obj[key].$class) {
+              self.implement(obj[key]);
             } else {
               if (_isFunction(obj[key])) {
                 func = _functionWrapper(key, obj, _isFunction(self[key]) ? self[key] : _noop);

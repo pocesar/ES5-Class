@@ -241,6 +241,37 @@ module.exports = {
       expect(Instance.four()).to.equal('four');
       expect(Instance.$implements).to.eql(Bases.slice(0, -1));
     },
+    testArrayMixin: function(){
+      var Class1 = Class.define('Class1', {}, {done: true}),
+          Class2 = Class.define('Class2', {func: function(){ return true; }}),
+          Class3 = Class.define('Class3', {}, {yet: true});
+      
+      var NewClass = Class.define('NewClass', {}, [Class1, Class2, Class3]);
+      
+      expect(NewClass.done).to.equal(true); 
+      expect(NewClass.yet).to.equal(true); 
+      expect(NewClass.$parent).to.eql(Class);
+      expect(NewClass.$implements).to.eql([Class1, Class2, Class3]);
+      expect(NewClass.create().func()).to.equal(true); 
+      expect(NewClass.create().$class.done).to.equal(true); 
+      
+      expect(NewClass.create().func()).to.equal(true); 
+      
+      NewClass.done = false;
+      
+      var NewClass2 = Class2.define('NewClass2', {}, [Class1, Class3]);
+      
+      expect(NewClass2.create().func()).to.equal(true);
+      
+      Class2.include({
+        func: function(){
+          return false;
+        }
+      });
+
+      expect(NewClass2.create().func()).to.equal(false);
+      expect(NewClass2.done).to.equal(true);
+    },
     testClassAccesses: function(){
       var h = Class.define('Class', function(){
         return {
