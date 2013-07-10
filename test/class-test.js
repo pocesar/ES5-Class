@@ -30,7 +30,6 @@ module.exports = {
         run  : function (){
           for (var i = 1; i <= 10; i++) {
             this.ran++;
-            console.log('It ran for ' + i + ' miles!');
           }
         },
         ran  : 0
@@ -162,6 +161,36 @@ module.exports = {
   },
 
   ES5Class: {
+    testClassAccesses: function(){
+      var h = Class.define('Class', function(){
+        return {
+          done: function(){
+            expect(this.$class.property).to.equal(true);
+            expect(this.property).to.be.an('undefined');
+            expect(this.dupe).to.be.an('undefined');
+            expect(this.$class.dupe()).to.equal('dupe');
+            
+            this.$class.property = false;
+          }
+        }; 
+      }, {
+        property: true,
+        dupe: function(){
+          expect(this.property).to.equal(true);
+          return 'dupe';
+        }
+      });
+      
+      expect(h).to.eql(h.$class);
+      
+      h.create().done();
+      expect(h.property).to.equal(false);
+      
+      h.property = true;
+      expect(h.dupe()).to.equal('dupe');
+      expect(h.property).to.equal(true);
+      expect(h.$className).to.equal('Class');
+    },
     testDuckTyping: function (){
 
       var Op = Class.define('Op', {
@@ -289,14 +318,12 @@ module.exports = {
 
       var ES5FrenchGuy = ES5Person.define('ES5FrenchGuy', {
         setAddress: function (city, street){
-          //console.log(this.$super.toString(), city, street);
           this.$super('France', city, street);
         }
       });
 
       var ES5ParisLover = ES5FrenchGuy.define('ES5ParisLover', {
         setAddress: function (street){
-          //console.log(this.$super.toString(), street);
           this.$super('Paris', street);
         }
       });
@@ -425,11 +452,87 @@ module.exports = {
       expect(dog.cry()).to.equal('wof!');
       expect(beagle.cry()).to.equal('wof!');
     },
-  
+    
+    testExtendingBase: function(){
+      var Base = Class.define('Base', {
+        done: function(){
+          this.$class.count++;
+        }
+      }, {
+        count: 1
+      });
+      
+      var Next = Base.define('Next', {
+        
+      }, {
+        count: 0
+      });
+      
+      expect(Base.count).to.equal(1);
+      expect(Next.count).to.equal(0);
+      
+      var base = Base.create();
+      var next = Next.create();
+      
+      base.done();
+      next.done();
+      
+      expect(Base.count).to.equal(2);
+      expect(Next.count).to.equal(1);
+      
+      Base.include({
+        included: function(){
+          this.$class.count++;
+          return true;
+        }
+      });
+      
+      Base.implement({
+        implemented: function(){
+          this.count++;
+          return true;
+        },
+        parented: function(){
+          if (this.$parent.count) {
+            this.$parent.count++;
+          }
+        }
+      });
+      
+      expect(next.included()).to.equal(true);
+      expect(Next.count).to.equal(2);
+      expect(Next.implemented()).to.equal(true);
+      expect(Next.count).to.equal(3);
+      expect(Base.implemented()).to.equal(true);
+      expect(Base.count).to.equal(3);
+      expect(Next.count).to.equal(3);
+      Base.parented();
+      expect(Base.count).to.equal(3);
+      Next.parented();
+      
+      Next.implement({
+        implemented: function(item){
+          return typeof item !== 'undefined' ? item : void 0;
+        },
+        another: function(){
+          return this.$parent.implemented();
+        },
+        other: function(){
+          return this.implemented(false);
+        }
+      });
+      
+      expect(Next.count).to.equal(3);
+      expect(Base.count).to.equal(4);
+      expect(Next.implemented()).to.be.an('undefined');
+      expect(Next.another()).to.equal(true);
+      expect(Next.other()).to.equal(false);
+    },
+    
     testClosureParentMethod: function(){
       var Clss = Class.define('Clss', {}, function(){
         return {
-          construct: function(oval){
+          factory: function(oval){
             this.oval = oval;
             return this;
           }
@@ -437,20 +540,28 @@ module.exports = {
       });
       
       var Clsss = Clss.define('Clsss', {}, function($super){
-        expect(this.construct).to.be.ok();
-        expect(this.construct).to.eql($super.construct);
+        expect(this.factory).to.be.ok();
+        expect(this.factory).to.eql($super.factory);
         
         return {
-          construct: function(oval){
+          factory: function(oval){
             expect($super).to.eql(Clss);
-            $super.construct.call(this, oval);
+            $super.factory.call(this, oval);
             return this;
           }
         };
       });
       
-      expect(Clsss.construct(true).oval).to.be(true);
+      expect(Clsss.factory(true).oval).to.be(true);
       
+      var Cls = Clsss.define('Cls', {}, {
+        factory: function(){
+          this.$super(false);
+          return this;
+        }
+      });
+      
+      expect(Cls.factory().oval).to.equal(false);
     },
     
     testClosureParentInstance: function(){

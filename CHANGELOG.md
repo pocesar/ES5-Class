@@ -1,3 +1,7 @@
+## 0.6.2
+
+* Added a new test and reordered `README.md`, added JsDocs in source
+
 ## 0.6.1
 
 * Forgot to update `README.md` to the new code

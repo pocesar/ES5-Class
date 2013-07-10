@@ -1,5 +1,5 @@
 /**
- * @version 0.6.1
+ * @version 0.6.2
  */
 
 var
@@ -31,9 +31,9 @@ var
     return function (){
       var originalSuper, ret, self = this;
 
-      originalSuper = self.$super;
+      originalSuper = self.$super; // store current $super
 
-      // if we have an original, it's a Class method call, otherwise, let's look for the parent
+      // if we have an original, it's a Class method call, otherwise, let's look for the parent, or use an empty function
       self.$super = original || self.$parent[key] || _noop;
       ret = obj[key].apply(self, arguments);
 
@@ -42,10 +42,45 @@ var
       return ret;
     };
   },
+  /**
+   * Base class that should define other classes
+   * 
+   * @constructor
+   */
   ES5Class = {
     prototype: {
+      /** @constructs ES5Class */
       construct: _noop
     },
+    /** 
+     * Define a new class
+     * 
+     * @param {String} className The name of the class
+     * @param {Object|Function} [include] Your class prototype functions and variables or closure
+     * @param {Object|Function} [implement] Your class static methods or closure
+     * 
+     * @example
+     * <pre>
+     *   var NewClass = ES5Class.define('name', {
+     *     construct: function(){
+     *     }
+     *   }, {
+     *     static: 1
+     *   });
+     *   // If you use a function, you need to return an object
+     *   var NewClass = ES5Class.define('name', function(){
+     *    // private variables
+     *    
+     *    return {
+     *      construct: function(){
+     *      }
+     *    };
+     *   });
+     * </pre>
+     * 
+     * @throws Error
+     * @return ES5Class
+     */
     define   : function (className, include, implement){
       var
         self = this, object, isClass, getClass;
@@ -128,6 +163,12 @@ var
 
       return object;
     },
+    /** 
+     * Create a new instance of your class
+     * 
+     * @instance
+     * @return ES5Class
+     */
     create   : function (){
       var
         self = this,
@@ -141,6 +182,13 @@ var
 
       return instance;
     },
+    /**
+     * Add, override or overload prototype methods of the class
+     * 
+     * @param {Object|Function} obj The definition object or closure
+     * 
+     * @return ES5Class
+     */
     include  : function (obj){
       var self = this, wrap;
 
@@ -168,6 +216,13 @@ var
 
       return self;
     },
+    /**
+     * Add, override or overload static methods to the class
+     * 
+     * @param {Object|Function} obj The definition object or closure
+     * 
+     * @return ES5Class
+     */
     implement: function (obj){
       var self = this, func;
 
@@ -204,18 +259,35 @@ var
     }
   };
 
+/**
+ * Get the current class name
+ * 
+ * @typedef {String} $className
+ */
 Object.defineProperty(ES5Class, '$className', {
   get: function (){
     return 'ES5Class';
   }
 });
 
+/**
+ * Get the current class definition created with ES5Class.define
+ * Accessed by this.$class
+ * 
+ * @typedef {Object} $class
+ */
 Object.defineProperty(ES5Class.prototype, '$class', {
   get: function (){
     return ES5Class;
   }
 });
 
+/**
+ * Returns true if the current instance is an instance of the class 
+ * definition passed parameter 
+ * 
+ * @function $instanceOf 
+ */
 Object.defineProperty(ES5Class.prototype, '$instanceOf', {
   value: function (object){
     return object && object.prototype && object.prototype.isPrototypeOf ? object.prototype.isPrototypeOf(this) : false;

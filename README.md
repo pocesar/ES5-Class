@@ -8,7 +8,7 @@ A Class object that enables native prototypal inheritance
 Why should we write code like if we were in 2010? Read on!
 
 * Inheritance made easy
-* Uses Object.create and Object.defineProperty ES5 methods to enable native prototypal inheritance with proper settings (enumerable, configurable, writable)
+* Uses `Object.create` and `Object.defineProperty` ES5 methods to enable native prototypal inheritance with proper settings (enumerable, configurable, writable)
 * Works with Node.js 0.8.x and up.
 * Instances and classes gets useful methods and properties for reflections and navigation
 * Functions to implement other class methods and include other instance/prototype methods
@@ -30,8 +30,11 @@ __Contributors__
 ## Install
 -----------
 
+```bash
+$ npm install es5class
 ```
-npm install es5class
+
+```js
 // then in your code
 var Class = require('es5class');
 ```
@@ -40,8 +43,8 @@ var Class = require('es5class');
 
 Like this module? Star it in github and do in your command line
 
-```js
-npm star es5class
+```bash
+$ npm star es5class
 ```
 
 ## Usage
@@ -53,20 +56,140 @@ npm star es5class
 var Animal = Class.define(
     // Class Name
     'Animal', 
-    // Instance Methods/Properties, these will only be available through a class instance, through Animal.create('Name')
+    // Prototype methods/variables, these will only be available through a class instance, in this case, through Animal.create('Name')
     { 
-        construct: function(name) { // Constructor is called automatically on instantiation
+        construct: function(name) { // this is called automatically on instantiation
             this.name = name;
         },
         getName: function() {
             return this.name;
         }
     },
-    // Class Methods/Properties, this will only be available through Animal, as in Animal.count
+    // Class methods/variables, this will only be available through Animal, as in Animal.count or Animal.getCount()
     { 
-        count: 0
+        count: 0,
+        getCount: function(){
+            return this.count;
+        }
     }
 );
+```
+
+### Class inheritance
+
+```js
+var Bird = Animal.define('Bird', {
+    construct: function(name) {
+        this.$super('Yellow ' + name); // calls parent class constructor, calls Animal.prototype.construct and set this.name = 'Yellow ' + name
+    },
+    canFly: true
+});
+```
+
+### Extending a prototype
+
+```js
+Bird.include({ // include is like doing _.extend(Bird.prototype, {}) but with proper wrapping the methods for $super access
+    fly: function() {
+        if(this.canFly) console.log(this.name + " flies!");
+    },
+});
+```
+
+### Encapsulate logic by passing a closure
+
+```js
+Bird.include(function($super){ // $super is the Animal prototype (the parent), it constains only "construct" and "getName" per definitions above
+    var timesBeaked = 0;
+    // "this" refers to the current Class definition, that is, Bird, so you can access 
+    // static variables plus the prototype
+    //
+    // this.prototype.getName();
+    // this.count
+    //
+    // you may want to set var self = this; for usage inside the functions
+    return {
+        beak: function(){
+            return ++timesBeaked;
+        }
+    };
+});
+
+Bird.implement(function($super){ // $super is the Animal class itself (the parent)
+    // "this" refers to the current Class definition, the same way it happens 
+    // when extending the prototype (using include), you may access this.prototype in
+    // here as well
+    return {
+        catalog: function(){ // Bird.catalog() is now available
+        }
+    };
+});
+```
+
+### Extending a class
+
+```js
+// These functions and values persist between class creation, serve as static methods
+Animal.implement({
+    run: function() {
+        for(var i=1; i<=10; i++) {
+            this.ran++; // this refer to the current class definition (either Dog, Animal or Cat)
+            // you may change it to Animal.ran to make the same value available to all classes
+            // also, you may use the this.$parent.ran to set it always on the Animal class when
+            // calling on extended classes (Dog and Cat)
+            console.log("Animal ran for " + i + " miles!");
+        }
+    },
+    ran: 0
+}); 
+    
+var Dog = Animal.define('Dog');
+Animal.run(); // Dog.ran and Animal.ran are 10
+var Cat = Animal.define('Cat');
+Cat.run(); // Cat.ran is 20, Dog.ran and Animal.ran are 10
+Dog.run(); // 
+Dog.run(); // Cat.ran is 20, Dog.ran is 30 and Animal.ran is 10
+
+// If you implement the same method, you can update the parent using this.$parent
+// If you want to update the parent value, you can also use this.$parent.ran
+Dog.implement({
+    run: function(){
+        this.ran += 10;
+        this.$parent.run(); // Animal.ran is now 20
+    }
+});
+
+Dog.run(); // Dog.ran is now 40, Animal.ran and Cat.ran are now 20
+```
+
+### Creating an instance
+
+```js
+var animal = Animal.create("An Animal");
+var bird = Bird.create("A Bird");
+```
+
+### Checking instances
+
+```js
+animal.$instanceOf(Animal); // true
+animal.$instanceOf(Bird);   // false
+bird.$instanceOf(Animal);   // true
+bird.$instanceOf(Bird);     // true
+bird.$instanceOf(Class);    // true
+```
+
+### Other useful methods and properties
+
+```js
+Animal.$className;                // 'Animal'
+bird.$class;                      // returns the Bird class definition, you can do a $class.create('instance', 'params')
+bird.$class.$className            // 'Bird'
+bird.$class.$parent.$className    // 'Animal'
+bird.$parent.$className           // 'Animal'
+bird.$parent.$parent.$className   // 'ES5Class'
+bird.$isClass(Bird);              // true
+Animal.$isClass(Bird);            // false
 ```
 
 ### Singletons
@@ -91,54 +214,24 @@ ExtraSingleton.extra // true
 ExtraSingleton.staticVariable // 1
 ``` 
  
-### Class inheritance
-
-```js
-var Bird = Animal.define('Bird', {
-    construct: function(name) {
-        this.$super('Yellow ' + name); // calls parent class constructor, calls Animal.construct and set this.name = name
-    },
-    canFly: true
-});
-```
-
-### Encapsulate logic by passing a closure
-
-```js
-Bird.include(function($super){ // $super is the Animal class prototype, it constains only "construct" and "getName"
-    var timesBeaked = 0;
-    // "this" refers to the current Class definition, so you can access static variables plus the prototype
-    // this.prototype.otherfunction();
-    // this.staticvar
-    return {
-        beak: function(){
-            return ++timesBeaked;
-        }
-    };
-});
-Bird.implement(function($super){ // $super is the Animal class itself
-    // "this" refers to the current Class definition, the same way it happens when extending the prototype (using include)
-    return {
-        catalog: function(){
-        }
-    };
-});
-```
-
 ### Share data between instances (flyweight pattern)
 
 ```js
-var Share = Class.define('Share', function($super){ // $super = ES5Class, the base class
-    var _data = {};
-    this.count++;
+var Share = Class.define('Share', function(){ 
+    var _data = {}; //all private data, that is shared between each Share.create()
     
     return {
+        construct: function(){
+            this.$class.count++;
+        },
         append: function(name, data){
           _data[name] = data;   
         }
     }
-}, {count: 0});
-var one = Share.create('one'), two = Share.create('two');
+}, {
+    count: 0 // exposed variable
+});
+var one = Share.create('one'), two = Share.create('two'); // Share.count is now 2
 one.append('dub', true); // _data is now {'dub': true}
 two.append('dub', false); // _data is now {'dub': false}
 two.append('bleh', [1,2,3]); // _data is now {'dub': false, 'bleh': [1,2,3]}
@@ -148,158 +241,83 @@ two.append('bleh', [1,2,3]); // _data is now {'dub': false, 'bleh': [1,2,3]}
 
 ```js
 var Op = Class.define('Op', {
-  construct: function (number){
-    this.number = number;
-  },
-  operator : function (number){
-    return number;
-  }
-});
-
-var Mul = Op.define('Multiply', {
-  operator: function (number){
-    return number * this.number;
-  }
-});
-
-var Div = Op.define('Divide', {
-  operator: function (number){
-    return number / this.number;
-  }
-});
-
-var Sum = Op.define('Sum', {
-  operator: function (number){
-    return number + this.number;
-  }
-});
-
-var Operation = Class.define('Operation', {}, function (){
-  var
-    classes = [],
-    number = 0;
-
-  return {
-    add     : function (clss){
-      for (var i = 0, len = clss.length; i < len; i++) {
-        classes.push(clss[i]);
-      }
-      return this;
+    construct: function (number){
+      this.number = number;
     },
-    number  : function (nmbr){
-      number = nmbr;
-      return this;
-    },
-    result  : function (){
-      var result = number;
-      for (var i = 0, len = classes.length; i < len; i++) {
-        result = classes[i].operator(result);
-        console.log(result);
-      }
-      return result;
-    },
-    onthefly: function (classes){
-      var result = number;
-      for (var i = 0, len = classes.length; i < len; i++) {
-        result = classes[i].operator(result);
-        console.log(result);
-      }
-      return result;
+    operator : function (number){
+      return number;
     }
-  };
-});
+  });
 
-var sum = Sum.create(40);
-var mul = Mul.create(50);
-var div = Div.create(20);
-Operation.number(100);
-Operation.add([sum, mul, div]).result(); // result is 350
-var mul2 = Mul.create(30);
-Operation.onthefly([div, sum, mul, mul2]); // result is 67500
-```
+  var Mul = Op.define('Multiply', {
+    operator: function (number){
+      return number * this.number;
+    }
+  });
 
-### Extending a prototype
+  var Div = Op.define('Divide', {
+    operator: function (number){
+      return number / this.number;
+    }
+  });
 
-```js
-Bird.include({ 
-    fly: function() {
-        if(this.canFly) console.log(this.name + " flies!");
-    },
-});
-```
+  var Sum = Op.define('Sum', {
+    operator: function (number){
+      return number + this.number;
+    }
+  });
 
-### Extending a class
+  var Operation = Class.define('Operation', {}, function (){
+    var
+      classes = [],
+      number = 0;
 
-```js
-// These functions and values persist between class creation, serve as static methods
-Animal.implement({
-    run: function() {
-        for(var i=1; i<=10; i++) {
-            this.ran++; // this refer to the current class definition (either Dog, Animal or Cat)
-            // you may change it to Animal.ran to make the same value available to all classes
-            // also, you may use the this.$parent.ran to set it always on the Animal class when
-            // calling on extended classes (Dog and Cat)
-            console.log("Animal ran for " + i + " miles!");
+    return {
+      add     : function (clss){
+        for (var i = 0, len = clss.length; i < len; i++) {
+          classes.push(clss[i]);
         }
-    },
-    ran: 0
-}); 
-var Dog = Animal.define('Dog');
-Animal.run(); // Cat.ran, Dog.ran and Animal.ran are 10
-var Cat = Animal.define('Cat');
-Cat.run(); // Cat.ran is 20, Dog.ran and Animal.ran are 10
-Dog.run(); // 
-Dog.run(); // Cat.ran is 20, Dog.ran is 30 and Animal.ran is 10
+        return this;
+      },
+      number  : function (nmbr){
+        number = nmbr;
+        return this;
+      },
+      result  : function (){
+        var result = number;
+        for (var i = 0, len = classes.length; i < len; i++) {
+          result = classes[i].operator(result);
+        }
+        return result;
+      },
+      onthefly: function (classes){
+        var result = number;
+        for (var i = 0, len = classes.length; i < len; i++) {
+          result = classes[i].operator(result);
+        }
+        return result;
+      }
+    };
+  });
 
-// If you implement the same method, you can update the parent using this.$parent
-// If you want to update the parent value, you can also use this.$parent.ran
-Dog.implement({
-    run: function(){
-        this.ran += 10;
-        this.$parent.run(); // Animal.ran is now 20
-    }
-});
-
-Dog.run() // Dog.ran is now 40
+  var sum = Sum.create(40);
+  var mul = Mul.create(50);
+  var div = Div.create(20);
+  Operation.number(100);
+  Operation.add([sum, mul, div]).result(); // Result is 350
+  var mul2 = Mul.create(30);
+  Operation.onthefly([div, sum, mul, mul2]); // Result is 67500
 ```
 
-### Creating an instance
-
-```js
-var animal = Animal.create("An Animal");
-var bird = Bird.create("A Bird");
-```
-
-### Checking instances
-
-```js
-animal.$instanceOf(Animal); // true
-animal.$instanceOf(Bird);   // false
-bird.$instanceOf(Animal);   // true
-bird.$instanceOf(Bird);     // true
-bird.$instanceOf(Class);    // true
-```
-
-### Other useful methods and properties
-
-```js
-Animal.$className;                // Animal
-bird.$class;                      // returns the Bird class definition, you can do a $class().create('another instance')
-bird.$class.$className            // Bird
-bird.$class.$parent.$className    // Animal
-bird.$parent.$className           // Animal
-bird.$parent.$parent.$className   // ES5Class
-bird.$isClass(Bird);              // true
-Animal.$isClass(Bird);            // false
-```
+For a lot of class examples (inheritance, extending, singletons, etc), check the test sources at `test/class-test.js`
 
 ## Running the tests
 -----------
 
-The tests are ran using [nodeunit](https://github.com/caolan/nodeunit)
+The tests are ran using [mocha](https://github.com/visionmedia/mocha)
 
-```
-npm install && npm test
+```bash
+$ npm install && npm test
 ```
 
 ## Benchmark
@@ -307,8 +325,8 @@ npm install && npm test
 
 Check how this library perform on your machine
 
-```
-node test/benchmark.js
+```bash
+$ npm install && node test/benchmark.js
 ```
 
 
