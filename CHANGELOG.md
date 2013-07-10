@@ -1,3 +1,7 @@
+## 0.6.3
+
+* Fixed mixin injection when using `define`
+
 ## 0.6.2
 
 * Added a new test and reordered `README.md`, added JsDocs in source

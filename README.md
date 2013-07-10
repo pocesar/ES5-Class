@@ -10,15 +10,14 @@ Why should we write code like if we were in 2010? Read on!
 * Inheritance made easy
 * Uses `Object.create` and `Object.defineProperty` ES5 methods to enable native prototypal inheritance with proper settings (enumerable, configurable, writable)
 * Works with Node.js 0.8.x and up.
-* Instances and classes gets useful methods and properties for reflections and navigation
 * Functions to implement other class methods and include other instance/prototype methods
 * Takes advantage of ES5 non-writable properties to disable the possibility of messing up the classes
-* Ability to inherit from multiple classes using arrays using `Class.extend('YourClass', [Class1, Class2, Class3])`
+* Ability to inherit from multiple classes using arrays using `Class.define('YourClass', [Class1, Class2, Class3])` without setting the `$parent` class, works like a mixin
 * Call `this.$super` to reach the parent instance class function or extended class method
-* Call `this.$parent` to reach the parent class method 
+* Call `this.$parent` to reach the parent class definition
 * Inject mixin code (as plain objects, functions or other classes) using `include`
 * Extend static class methods and properties with `implement`
-* `$implements` property contain all classes or objects that were implemented into the class
+* `$implements` property contain all classes that were implemented into the current class
 * The `construct` method is called with arguments when the class is instantiated
 * `$class` is available everywhere, it returns the current class, even before instantiation
 
@@ -160,6 +159,12 @@ Dog.implement({
 });
 
 Dog.run(); // Dog.ran is now 40, Animal.ran and Cat.ran are now 20
+```
+
+### Extend from multiple classes
+
+```js
+
 ```
 
 ### Creating an instance

@@ -161,6 +161,86 @@ module.exports = {
   },
 
   ES5Class: {
+    testArrayImplementInclude: function(){
+      var Bases = [
+        Class.define('Base1', {
+          one: function(){
+            return true;
+          }
+        }),
+        Class.define('Base2', {
+          two: function(){
+            return true;
+          }
+        }),
+        Class.define('Base3', {
+          one: function(){
+            return false;
+          },
+          two: function(){
+            return false;
+          },
+          three: function(){
+            return this.two();
+          }
+        }),
+        {
+          four: function(){
+            return 'four';
+          }
+        }
+      ];
+      
+      var Instance = Class.define('Instance', Bases);
+      var instance = Instance.create();
+      
+      expect(instance.one).to.be.a('function');
+      expect(instance.two).to.be.a('function');
+      expect(instance.four).to.be.a('function');
+      expect(instance.two()).to.equal(false);
+      expect(instance.one()).to.equal(false);
+      expect(instance.three()).to.equal(false);
+      expect(instance.four()).to.equal('four');
+
+      Bases = [
+        Class.define('Base1', {}, {
+          one: function(){
+            return true;
+          }
+        }),
+        Class.define('Base2', {}, {
+          two: function(){
+            return true;
+          }
+        }),
+        Class.define('Base3', {}, {
+          one: function(){
+            return false;
+          },
+          two: function(){
+            return false;
+          },
+          three: function(){
+            return this.two();
+          }
+        }),
+        {
+          four: function(){
+            return 'four';
+          }
+        }
+      ];
+      
+      Instance = Class.define('Instance', {}, Bases);
+      
+      expect(Instance.one).to.be.a('function');
+      expect(Instance.two).to.be.a('function');
+      expect(Instance.two()).to.equal(false);
+      expect(Instance.one()).to.equal(false);
+      expect(Instance.three()).to.equal(false);
+      expect(Instance.four()).to.equal('four');
+      expect(Instance.$implements).to.eql(Bases.slice(0, -1));
+    },
     testClassAccesses: function(){
       var h = Class.define('Class', function(){
         return {

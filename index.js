@@ -1,5 +1,5 @@
 /**
- * @version 0.6.2
+ * @version 0.6.3
  */
 
 var
@@ -202,7 +202,9 @@ var
         } else {
           for (var key in obj) {
             if (_hwp.call(obj, key)) {
-              if (_isFunction(obj[key])) {
+              if (obj[key].$class) {
+                self.include(obj[key]);
+              } else if (_isFunction(obj[key])) {
                 wrap = _functionWrapper(key, obj, _isFunction(self.prototype[key]) ? self.prototype[key] : _noop);
 
                 self.prototype[key] = wrap;
