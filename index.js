@@ -1,5 +1,5 @@
 /**
- * @version 0.7.0
+ * @version 0.7.1
  */
 'use strict';
 
@@ -194,7 +194,7 @@ var
     include  : function (obj){
       var self = this, wrap, newfunc;
 
-      if (typeof obj !== 'undefined' && obj) {
+      if (typeof obj !== 'undefined' && obj !== null) {
         if (_isArray(obj)) {
           for (var i = 0, len = obj.length; i < len; i++) {
             self.include(obj[i]);
@@ -204,14 +204,16 @@ var
         } else {
           for (var key in obj) {
             if (_hwp.call(obj, key)) {
-              if (obj[key].$class) {
-                self.include(obj[key]);
-              } else if (_isFunction(obj[key])) {
-                wrap = _functionWrapper(key, obj, _isFunction(self.prototype[key]) ? self.prototype[key] : _noop);
+              if (typeof obj[key] !== 'undefined') {
+                if (typeof obj[key].$class !== 'undefined') {
+                  self.include(obj[key]);
+                } else if (_isFunction(obj[key])) {
+                  wrap = _functionWrapper(key, obj, _isFunction(self.prototype[key]) ? self.prototype[key] : _noop);
 
-                self.prototype[key] = wrap;
-              } else {
-                self.prototype[key] = obj[key];
+                  self.prototype[key] = wrap;
+                } else {
+                  self.prototype[key] = obj[key];
+                }
               }
             }
           }
@@ -230,7 +232,7 @@ var
     implement: function (obj){
       var self = this, func, newfunc;
 
-      if (typeof obj !== 'undefined') {
+      if (typeof obj !== 'undefined' && obj !== null) {
         if (_isArray(obj)) {
           for (var i = 0, len = obj.length; i < len; i++) {
             self.implement(obj[i]);
@@ -238,22 +240,24 @@ var
         } else if (_isFunction(obj) && (typeof (newfunc = obj.call(self, self.$parent)) !== 'undefined')) {
           self.implement(newfunc);
         } else {
-          if (obj.$isClass && obj.$implements) {
+          if (typeof obj.$isClass !== 'undefined' && _isArray(obj.$implements)) {
             self.$implements.push(obj);
           }
 
           for (var key in obj) {
             if (_hwp.call(obj, key)) {
-              if (key !== 'prototype') {
-                if (obj[key].$class) {
-                  self.implement(obj[key]);
-                } else {
-                  if (_isFunction(obj[key])) {
-                    func = _functionWrapper(key, obj, _isFunction(self[key]) ? self[key] : _noop);
-
-                    self[key] = func;
+              if (typeof obj[key] !== 'undefined'){
+                if (key !== 'prototype') {
+                  if (typeof obj[key].$class !== 'undefined') {
+                    self.implement(obj[key]);
                   } else {
-                    self[key] = obj[key];
+                    if (_isFunction(obj[key])) {
+                      func = _functionWrapper(key, obj, _isFunction(self[key]) ? self[key] : _noop);
+
+                      self[key] = func;
+                    } else {
+                      self[key] = obj[key];
+                    }
                   }
                 }
               }
