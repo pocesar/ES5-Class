@@ -1,19 +1,21 @@
 /**
- * @version 0.6.4
+ * @version 0.7.0
  */
+'use strict';
 
 var
   _hwp = Object.prototype.hasOwnProperty,
+  _ts = Object.prototype.toString,
   _noop = function (){},
   _isArray = function (obj){
-    return obj && Object.prototype.toString.call(obj) === '[object Array]';
+    return obj && _ts.call(obj) === '[object Array]';
   },
-  _isFunction = function (obj){
-    return obj && (typeof obj === 'function');
+  _isFunction = function (object){
+    return object && _ts.call(object) === '[object Function]';
   },
   _hasSuperRegex = /\$super/,
   _functionWrapper = function (key, obj, original){
-    /* 
+    /*
      performance gain:
      476% on Class method calls
      40% on more than 1 level $super calls
@@ -44,7 +46,7 @@ var
   },
   /**
    * Base class that should define other classes
-   * 
+   *
    * @constructor
    */
   ES5Class = {
@@ -52,13 +54,13 @@ var
       /** @constructs ES5Class */
       construct: _noop
     },
-    /** 
+    /**
      * Define a new class
-     * 
+     *
      * @param {String} className The name of the class
      * @param {Object|Function} [include] Your class prototype functions and variables or closure
      * @param {Object|Function} [implement] Your class static methods or closure
-     * 
+     *
      * @example
      * <pre>
      *   var NewClass = ES5Class.define('name', {
@@ -70,14 +72,14 @@ var
      *   // If you use a function, you need to return an object
      *   var NewClass = ES5Class.define('name', function(){
      *    // private variables
-     *    
+     *
      *    return {
      *      construct: function(){
      *      }
      *    };
      *   });
      * </pre>
-     * 
+     *
      * @throws Error
      * @return ES5Class
      */
@@ -163,9 +165,9 @@ var
 
       return object;
     },
-    /** 
+    /**
      * Create a new instance of your class
-     * 
+     *
      * @instance
      * @return ES5Class
      */
@@ -184,21 +186,21 @@ var
     },
     /**
      * Add, override or overload prototype methods of the class
-     * 
+     *
      * @param {Object|Function} obj The definition object or closure
-     * 
+     *
      * @return ES5Class
      */
     include  : function (obj){
-      var self = this, wrap;
+      var self = this, wrap, newfunc;
 
-      if (typeof obj !== 'undefined') {
+      if (typeof obj !== 'undefined' && obj) {
         if (_isArray(obj)) {
           for (var i = 0, len = obj.length; i < len; i++) {
             self.include(obj[i]);
           }
-        } else if (_isFunction(obj)) {
-          self.include(obj.call(self, self.$parent.prototype));
+        } else if (_isFunction(obj) && (typeof (newfunc = obj.call(self, self.$parent.prototype)) !== 'undefined')) {
+          self.include(newfunc);
         } else {
           for (var key in obj) {
             if (_hwp.call(obj, key)) {
@@ -220,43 +222,48 @@ var
     },
     /**
      * Add, override or overload static methods to the class
-     * 
+     *
      * @param {Object|Function} obj The definition object or closure
-     * 
+     *
      * @return ES5Class
      */
     implement: function (obj){
-      var self = this, func;
+      var self = this, func, newfunc;
 
-      if (_isArray(obj)) {
-        for (var i = 0, len = obj.length; i < len; i++) {
-          self.implement(obj[i]);
-        }
-      } else if (_isFunction(obj)) {
-        self.implement(obj.call(self, self.$parent));
-      } else {
-        if (obj.$isClass && obj.$implements) {
-          self.$implements.push(obj);
-        }
+      if (typeof obj !== 'undefined') {
+        if (_isArray(obj)) {
+          for (var i = 0, len = obj.length; i < len; i++) {
+            self.implement(obj[i]);
+          }
+        } else if (_isFunction(obj) && (typeof (newfunc = obj.call(self, self.$parent)) !== 'undefined')) {
+          self.implement(newfunc);
+        } else {
+          if (obj.$isClass && obj.$implements) {
+            self.$implements.push(obj);
+          }
 
-        for (var key in obj) {
-          if (_hwp.call(obj, key)) {
-            if (key === 'prototype') {
-              self.include(obj[key]);
-            } else if (obj[key].$class) {
-              self.implement(obj[key]);
-            } else {
-              if (_isFunction(obj[key])) {
-                func = _functionWrapper(key, obj, _isFunction(self[key]) ? self[key] : _noop);
+          for (var key in obj) {
+            if (_hwp.call(obj, key)) {
+              if (key !== 'prototype') {
+                if (obj[key].$class) {
+                  self.implement(obj[key]);
+                } else {
+                  if (_isFunction(obj[key])) {
+                    func = _functionWrapper(key, obj, _isFunction(self[key]) ? self[key] : _noop);
 
-                self[key] = func;
-              } else {
-                self[key] = obj[key];
+                    self[key] = func;
+                  } else {
+                    self[key] = obj[key];
+                  }
+                }
               }
             }
           }
-        }
 
+          if (obj.prototype) {
+            self.include(obj.prototype);
+          }
+        }
       }
 
       return this;
@@ -265,7 +272,7 @@ var
 
 /**
  * Get the current class name
- * 
+ *
  * @typedef {String} $className
  */
 Object.defineProperty(ES5Class, '$className', {
@@ -277,7 +284,7 @@ Object.defineProperty(ES5Class, '$className', {
 /**
  * Get the current class definition created with ES5Class.define
  * Accessed by this.$class
- * 
+ *
  * @typedef {Object} $class
  */
 Object.defineProperty(ES5Class.prototype, '$class', {
@@ -287,10 +294,10 @@ Object.defineProperty(ES5Class.prototype, '$class', {
 });
 
 /**
- * Returns true if the current instance is an instance of the class 
- * definition passed parameter 
- * 
- * @function $instanceOf 
+ * Returns true if the current instance is an instance of the class
+ * definition passed parameter
+ *
+ * @function $instanceOf
  */
 Object.defineProperty(ES5Class.prototype, '$instanceOf', {
   value: function (object){

@@ -1,3 +1,9 @@
+## 0.7.0
+
+* Fixed `implement` when importing other classes like `EventEmitter`
+* Changed code to strict
+* Changed the way the prototype of functions and objects are cloned
+
 ## 0.6.4
 
 * Readme and more tests
@@ -39,6 +45,6 @@
 
 * Increased performance on `$super` calls by at least 40% and up to 476%
 
-## 0.3.5 
+## 0.3.5
 
 * Added `$super` to Class method calls
