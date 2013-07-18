@@ -248,11 +248,10 @@ module.exports = {
 
       AlmostEmptyClass.implement(require('events').EventEmitter);
 
-      expect(AlmostEmptyClass.create().lambda).to.equal(true);
-      expect(AlmostEmptyClass.listenerCount).to.be.ok();
-      expect(AlmostEmptyClass.create().on).to.be.a('function');
-
       var aec = AlmostEmptyClass.create();
+
+      expect(aec.lambda).to.equal(true);
+      expect(aec.on).to.be.a('function');
 
       aec.on('true', function(value){
         expect(value).to.equal(true);

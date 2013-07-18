@@ -1,3 +1,7 @@
+## 0.7.2
+
+* Fixed specific EventEmitter code for node 0.8
+
 ## 0.7.1
 
 * Fixed code for node 0.11 and 0.8
