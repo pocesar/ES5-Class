@@ -1,5 +1,7 @@
 [![Build Status](https://travis-ci.org/pocesar/ES5-Class.png?branch=master)](https://travis-ci.org/pocesar/ES5-Class)
 
+[![NPM](https://nodei.co/npm/es5class.png?downloads=true)](https://nodei.co/npm/es5class/)
+
 # ES5-Class
 -----------
 
@@ -54,9 +56,9 @@ $ npm star es5class
 ```js
 var Animal = Class.define(
     // Class Name
-    'Animal', 
+    'Animal',
     // Prototype methods/variables, these will only be available through a class instance, in this case, through Animal.create('Name')
-    { 
+    {
         construct: function(name) { // this is called automatically on instantiation
             this.name = name;
         },
@@ -65,7 +67,7 @@ var Animal = Class.define(
         }
     },
     // Class methods/variables, this will only be available through Animal, as in Animal.count or Animal.getCount()
-    { 
+    {
         count: 0,
         getCount: function(){
             return this.count;
@@ -100,7 +102,7 @@ Bird.include({ // include is like doing _.extend(Bird.prototype, {}) but with pr
 ```js
 Bird.include(function($super){ // $super is the Animal prototype (the parent), it contains only "construct" and "getName" per definitions above
     var timesBeaked = 0;
-    // "this" refers to the current Class definition, that is, Bird, so you can access 
+    // "this" refers to the current Class definition, that is, Bird, so you can access
     // static variables plus the prototype, before it's [re]defined
     //
     // this.prototype.getName();
@@ -115,7 +117,7 @@ Bird.include(function($super){ // $super is the Animal prototype (the parent), i
 });
 
 Bird.implement(function($super){ // $super is the Animal class itself (the parent)
-    // "this" refers to the current Class definition, the same way it happens 
+    // "this" refers to the current Class definition, the same way it happens
     // when extending the prototype (using include), you may access this.prototype in
     // here as well
     return {
@@ -140,13 +142,13 @@ Animal.implement({
         }
     },
     ran: 0
-}); 
-    
+});
+
 var Dog = Animal.define('Dog');
 Animal.run(); // Dog.ran and Animal.ran are 10
 var Cat = Animal.define('Cat');
 Cat.run(); // Cat.ran is 20, Dog.ran and Animal.ran are 10
-Dog.run(); // 
+Dog.run(); //
 Dog.run(); // Cat.ran is 20, Dog.ran is 30 and Animal.ran is 10
 
 // If you implement the same method, you can update the parent using this.$parent
@@ -198,7 +200,7 @@ var Class1 = Class.define('Class1', {}, {done: true}),
     Class2 = Class.define('Class2', {func: function(){ return true; }}),
     Class3 = Class.define('Class3', {}, {yet: true});
 
-var NewClass = Class.define('NewClass', {}, [Class1, Class2, Class3]); 
+var NewClass = Class.define('NewClass', {}, [Class1, Class2, Class3]);
 // Pay attention that it needs to go in the second parameter
 // or using NewClass.implement([Class1, Class2, Class3]);
 
@@ -207,7 +209,7 @@ console.log(NewClass.yet); // true
 console.log(NewClass.$parent); // ES5Class
 console.log(NewClass.$implements); // [Class1,Class2,Class3]
 console.log(NewClass.create().func()); // true
-console.log(NewClass.create().$class.done); // true    
+console.log(NewClass.create().$class.done); // true
 
 // Changing the base classes doesn't change the mixin'd class
 ```
@@ -232,20 +234,20 @@ ExtraSingleton.staticHelper() // outputs 'helper'
 Singleton.extra // undefined
 ExtraSingleton.extra // true
 ExtraSingleton.staticVariable // 1
-``` 
- 
+```
+
 ### Share data between instances (flyweight pattern)
 
 ```js
-var Share = Class.define('Share', function(){ 
+var Share = Class.define('Share', function(){
     var _data = {}; //all private data, that is shared between each Share.create()
-    
+
     return {
         construct: function(){
             this.$class.count++;
         },
         append: function(name, data){
-          _data[name] = data;   
+          _data[name] = data;
         }
     }
 }, {
