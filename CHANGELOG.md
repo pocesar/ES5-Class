@@ -1,7 +1,9 @@
 ## 0.8.0
 
-* This branch uses `__proto__`/`Object.setPrototypeOf` instead of `Object.create`
-* The class itself can be instantiated using `MyClass(instance, values)` instead of `MyClass.create(instance, values)`
+* Version 0.8.0 got breaking API changes, because the behavior of mixins has changed (now properly applies instance and class methods separately)
+* Added more tests and made some changes to existing ones
+* This branch uses `__proto__`/`Object.setPrototypeOf` instead of `Object.create`, so the next item could happen
+* The class can be auto instantiated using `MyClass(instance, values)` instead of `MyClass.create(instance, values)`
 
 ## 0.7.2
 

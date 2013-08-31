@@ -200,9 +200,15 @@ var Class1 = Class.define('Class1', {}, {done: true}),
     Class2 = Class.define('Class2', {func: function(){ return true; }}),
     Class3 = Class.define('Class3', {}, {yet: true});
 
+// This mix in the whole class (prototype and class methods)
 var NewClass = Class.define('NewClass', {}, [Class1, Class2, Class3]);
-// Pay attention that it needs to go in the second parameter
+
+// Pay attention that it needs to go in the second parameter if you want
+// to copy the object properties AND the prototype properties
+
 // or using NewClass.implement([Class1, Class2, Class3]);
+
+Class1.done = false;
 
 console.log(NewClass.done); // true
 console.log(NewClass.yet); // true
@@ -212,6 +218,13 @@ console.log(NewClass.create().func()); // true
 console.log(NewClass.create().$class.done); // true
 
 // Changing the base classes doesn't change the mixin'd class
+
+// This mix in class methods as prototypes
+NewClass = Class.define('NewClass', [Class1, Class2, Class3]);
+
+console.log(NewClass.create().yet); // true
+console.log(NewClass.create().done); // true
+console.log(NewClass.create().func); // undefined
 ```
 
 ### Singletons

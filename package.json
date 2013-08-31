@@ -13,7 +13,9 @@
     "prototypal",
     "object.create",
     "object.defineProperty",
-    "prototype"
+    "prototype",
+    "__proto__",
+    "setPrototypeOf"
   ],
   "repository": {
     "type": "git",

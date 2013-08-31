@@ -5,6 +5,7 @@ var
 
 module.exports = {
   beforeEach: function (){
+    console.log(Object.setPrototypeOf);
     Animal = Class.define(
       'Animal',
       {
@@ -161,17 +162,62 @@ module.exports = {
   },
 
   ES5Class: {
+    testEnumerables: function(){
+      var Cls = Class.define('Cls', {
+        construct: function(name){
+          this.name = name;
+        },
+        isTrue: function(){
+          return true;
+        }
+      }, {
+        isFalse: function(){
+          return false;
+        }
+      });
+
+      expect(Object.keys(Cls)).to.eql(['isFalse']);
+      expect(Object.keys(Cls('name'))).to.eql(['name']);
+    },
+    testDirectClassMixin: function(){
+      var
+        Class1 = Class.define('Class1', {
+          isTrue: function(){
+            return true;
+          }
+        }, {
+          isFalse: function(){
+            return false;
+          }
+        }),
+        Class2 = Class.define('Class2', Class1);
+
+      expect(Class2.create().isTrue).to.be.an('undefined');
+      expect(Class2.create().isFalse()).to.equal(false);
+      expect(Class2.$implements).to.eql([]);
+
+      Class2.implement(Class1);
+      expect(Class2.isFalse()).to.equal(false);
+      expect(Class2.create().isTrue()).to.equal(true);
+    },
     testArrayImplementInclude: function(){
       var Bases = [
         Class.define('Base1', {
           one: function(){
             return true;
           }
+        }, {
+          yes: function(){
+            return 'yes';
+          },
+          included: true
         }),
         Class.define('Base2', {
           two: function(){
             return true;
           }
+        }, {
+          included: false
         }),
         Class.define('Base3', {
           one: function(){
@@ -191,55 +237,27 @@ module.exports = {
         }
       ];
 
-      var Instance = Class.define('Instance', {}, Bases);
+      var Instance = Class.define('Instance', Bases);
       var instance = Instance.create();
 
-      expect(instance.one).to.be.a('function');
-      expect(instance.two).to.be.a('function');
-      expect(instance.four).to.be.an('undefined');
-      expect(instance.$class.four).to.be.a('function');
-      expect(instance.two()).to.equal(false);
-      expect(instance.one()).to.equal(false);
-      expect(instance.three()).to.equal(false);
-      expect(instance.$class.four()).to.equal('four');
-
-      Bases = [
-        Class.define('Base1', {}, {
-          one: function(){
-            return true;
-          }
-        }),
-        Class.define('Base2', {}, {
-          two: function(){
-            return true;
-          }
-        }),
-        Class.define('Base3', {}, {
-          one: function(){
-            return false;
-          },
-          two: function(){
-            return false;
-          },
-          three: function(){
-            return this.two();
-          }
-        }),
-        {
-          four: function(){
-            return 'four';
-          }
-        }
-      ];
+      expect(instance.yes).to.be.a('function');
+      expect(instance.included).not.to.be.an('undefined');
+      expect(instance.one).to.be.an('undefined');
+      expect(instance.two).to.be.an('undefined');
+      expect(instance.four).to.be.a('function');
+      expect(instance.yes()).to.equal('yes');
+      expect(instance.four()).to.equal('four');
+      expect(instance.included).to.equal(false);
 
       Instance = Class.define('Instance', {}, Bases);
 
-      expect(Instance.one).to.be.a('function');
-      expect(Instance.two).to.be.a('function');
-      expect(Instance.two()).to.equal(false);
-      expect(Instance.one()).to.equal(false);
-      expect(Instance.three()).to.equal(false);
+      expect(Instance.one).to.be.an('undefined');
+      expect(Instance.two).to.be.an('undefined');
+      expect(Instance.four).to.be.a('function');
+      expect(Instance.yes).to.be.a('function');
       expect(Instance.four()).to.equal('four');
+      expect(Instance.yes()).to.equal('yes');
+      expect(Instance.create().three()).to.equal(false);
       expect(Instance.$implements).to.eql(Bases.slice(0, -1));
     },
     testInstanceWithoutCreate: function(){
@@ -250,10 +268,11 @@ module.exports = {
         test: function(extra){
           return this.lol + (extra || '');
         }
-      });
+      }), s = S('rofl');
 
       expect(S.create('lol').test()).to.equal('lol');
       expect(S('lmao').test('!')).to.equal('lmao!');
+      expect(s).to.be.an('object');
     },
     testImplementEventEmitter: function(done){
       var AlmostEmptyClass = Class.define('AlmostEmptyClass', {
@@ -281,6 +300,7 @@ module.exports = {
 
       var NewClass = Class.define('NewClass', {}, [Class1, Class2, Class3]);
 
+      Class1.done = false;
       expect(NewClass.done).to.equal(true);
       expect(NewClass.yet).to.equal(true);
       expect(NewClass.$parent).to.eql(Class);
@@ -303,7 +323,7 @@ module.exports = {
       });
 
       expect(NewClass2.create().func()).to.equal(false);
-      expect(NewClass2.done).to.equal(true);
+      expect(NewClass2.done).to.equal(false);
     },
     testClassAccesses: function(){
       var h = Class.define('Class', function(){
@@ -348,19 +368,19 @@ module.exports = {
 
       var Mul = Op.define('Multiply', {
         operator: function (number){
-          return number * this.number;
+          return (number) * (this.number);
         }
       });
 
       var Div = Op.define('Divide', {
         operator: function (number){
-          return number / this.number;
+          return (number) / (this.number);
         }
       });
 
       var Sum = Op.define('Sum', {
         operator: function (number){
-          return number + this.number;
+          return (number) + (this.number);
         }
       });
 
@@ -485,7 +505,7 @@ module.exports = {
 
     },
 
-    testClassExtend: function (){
+    testClassDefine: function (){
       expect(function (){
         Class.define();
       }).to.throwException();
@@ -554,6 +574,9 @@ module.exports = {
 
       expect(animal.$instanceOf).to.be.ok();
       expect(privat.$instanceOf).to.be.ok();
+      expect(privat.$instanceOf(Privat)).to.be(true);
+      expect(animal.$instanceOf(Animal)).to.be(true);
+      expect(animal.$instanceOf(Privat)).to.be(false);
 
     },
 
@@ -606,9 +629,7 @@ module.exports = {
         count: 1
       });
 
-      var Next = Base.define('Next', {
-
-      }, {
+      var Next = Base.define('Next', {}, {
         count: 0
       });
 
@@ -853,7 +874,7 @@ module.exports = {
 
     testConstructor: function (){
       expect(typeof Bird).to.be('function');
-      expect(Bird.create).to.be.ok();
+      expect(Bird.create).to.be.a('function');
     }
   }
 };
