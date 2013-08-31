@@ -1,3 +1,8 @@
+## 0.8.0
+
+* This branch uses `__proto__`/`Object.setPrototypeOf` instead of `Object.create`
+* The class itself can be instantiated using `MyClass(instance, values)` instead of `MyClass.create(instance, values)`
+
 ## 0.7.2
 
 * Fixed specific EventEmitter code for node 0.8

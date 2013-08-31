@@ -191,16 +191,17 @@ module.exports = {
         }
       ];
 
-      var Instance = Class.define('Instance', Bases);
+      var Instance = Class.define('Instance', {}, Bases);
       var instance = Instance.create();
 
       expect(instance.one).to.be.a('function');
       expect(instance.two).to.be.a('function');
-      expect(instance.four).to.be.a('function');
+      expect(instance.four).to.be.an('undefined');
+      expect(instance.$class.four).to.be.a('function');
       expect(instance.two()).to.equal(false);
       expect(instance.one()).to.equal(false);
       expect(instance.three()).to.equal(false);
-      expect(instance.four()).to.equal('four');
+      expect(instance.$class.four()).to.equal('four');
 
       Bases = [
         Class.define('Base1', {}, {
@@ -240,6 +241,19 @@ module.exports = {
       expect(Instance.three()).to.equal(false);
       expect(Instance.four()).to.equal('four');
       expect(Instance.$implements).to.eql(Bases.slice(0, -1));
+    },
+    testInstanceWithoutCreate: function(){
+      var S = Class.define('S', {
+        construct: function(lol){
+          this.lol = lol;
+        },
+        test: function(extra){
+          return this.lol + (extra || '');
+        }
+      });
+
+      expect(S.create('lol').test()).to.equal('lol');
+      expect(S('lmao').test('!')).to.equal('lmao!');
     },
     testImplementEventEmitter: function(done){
       var AlmostEmptyClass = Class.define('AlmostEmptyClass', {
@@ -838,7 +852,7 @@ module.exports = {
     },
 
     testConstructor: function (){
-      expect(typeof Bird).not.to.be('function');
+      expect(typeof Bird).to.be('function');
       expect(Bird.create).to.be.ok();
     }
   }

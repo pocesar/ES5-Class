@@ -1,6 +1,6 @@
 {
   "name": "es5class",
-  "version": "0.7.2",
+  "version": "0.8.0",
   "description": "Prototypal inheritance based on ES5 Object.create and Object.defineProperty for node.js only",
   "keywords" : [
     "es5",
