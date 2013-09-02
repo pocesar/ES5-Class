@@ -10,22 +10,25 @@ A Class object that enables native prototypal inheritance
 Why should we write code like if we were in 2010? Read on!
 
 * Inheritance made easy
-* Uses `Object.create` and `Object.defineProperty` ES5 methods to enable native prototypal inheritance with proper settings (enumerable, configurable, writable)
+* Uses `Object.setPrototypeOf` (when available, using `__proto__` when isn't), `Object.create` and `Object.defineProperty` ES5/ES6 methods to enable native prototypal inheritance with proper settings (enumerable, configurable, writable)
 * Works with Node.js 0.8.x and up.
 * Functions to implement other class methods and include other instance/prototype methods
+* The `implement` method imports both prototype and class methods
+* The `include` method imports prototype methods, and class methods as prototype
 * Takes advantage of ES5 non-writable properties to disable the possibility of messing up the classes
-* Ability to inherit from multiple classes using arrays using `Class.define('YourClass', [Class1, Class2, Class3])` without setting the `$parent` class, works like a mixin
+* Ability to inherit from multiple classes using arrays using `Class.define('YourClass', [Class1, Class2, Class3])` without setting the `$parent` class, working like a mixin
 * Call `this.$super` to reach the parent instance class function or extended class method
 * Call `this.$parent` to reach the parent class definition
-* Inject mixin code (as plain objects, functions or other classes) using `include`
+* Inject mixin code (as plain objects, functions or other classes) using `include`/`implement`
 * Extend static class methods and properties with `implement`
 * `$implements` property contain all classes that were implemented into the current class
 * The `construct` method is called with arguments when the class is instantiated
 * `$class` is available everywhere, it returns the current class, even before instantiation
+* You are free to instantiate your class using `Class.create(arguments)`, `Class(arguments)` and `new Class(arguments)`
 
 __Contributors__
 
-* [ShadowCloud](https://github.com/ShadowCloud)
+* [bfil](https://github.com/bfil)
 * [pocesar](https://github.com/pocesar)
 
 ## Install
@@ -55,24 +58,24 @@ $ npm star es5class
 
 ```js
 var Animal = Class.define(
-    // Class Name
-    'Animal',
-    // Prototype methods/variables, these will only be available through a class instance, in this case, through Animal.create('Name')
-    {
-        construct: function(name) { // this is called automatically on instantiation
-            this.name = name;
-        },
-        getName: function() {
-            return this.name;
-        }
+  // Class Name
+  'Animal',
+  // Prototype methods/variables, these will only be available through a class instance, in this case, through Animal.create('Name')
+  {
+    construct: function (name){ // this is called automatically on instantiation
+      this.name = name;
     },
-    // Class methods/variables, this will only be available through Animal, as in Animal.count or Animal.getCount()
-    {
-        count: 0,
-        getCount: function(){
-            return this.count;
-        }
+    getName  : function (){
+      return this.name;
     }
+  },
+  // Class methods/variables, this will only be available through Animal, as in Animal.count or Animal.getCount()
+  {
+    count   : 0,
+    getCount: function (){
+      return this.count;
+    }
+  }
 );
 ```
 
@@ -80,10 +83,13 @@ var Animal = Class.define(
 
 ```js
 var Bird = Animal.define('Bird', {
-    construct: function(name) {
-        this.$super('Yellow ' + name); // calls parent class constructor, calls Animal.prototype.construct and set this.name = 'Yellow ' + name
-    },
-    canFly: true
+  construct: function (name, canFly){
+    if (canFly) {
+      this.canFly = canFly;
+    }
+    this.$super(name + ' Bird'); // calls parent class constructor, calls Animal.prototype.construct and set this.name = 'Yellow ' + name
+  },
+  canFly   : false
 });
 ```
 
@@ -91,39 +97,110 @@ var Bird = Animal.define('Bird', {
 
 ```js
 Bird.include({ // include is like doing _.extend(Bird.prototype, {}) but with proper wrapping the methods for $super access
-    fly: function() {
-        if(this.canFly) console.log(this.name + " flies!");
-    },
+  fly: function (){
+    if (this.canFly) {
+      console.log(this.name + ' flies!');
+    } else {
+      console.log(this.name + ' cant fly');
+    }
+  }
+});
+```
+
+### Implement
+
+```js
+// "Implement" import prototype (if any) and class methods from the given object, to the class declaration and the prototype
+var
+    Class1 = Class.define('Class1'),
+    obj = {yup: true},
+    h = function(){};
+
+h.prototype.nope = false;
+
+Class1.implement([obj, h]);
+
+console.log(Class1.yup); // true (imported to the class declaration)
+console.log(Class1.create().nope); // false (imported to the prototype)
+```
+
+### Include
+
+```js
+// "Implement" import class methods *ONLY* from the given object, to the class declaration prototype *ONLY*
+var
+    Class1 = Class.define('Class1'),
+    obj = {yup: true},
+    h = function(){};
+
+h.prototype.nope = false;
+h.yep = false;
+
+Class1.include([obj, h]);
+
+console.log(Class1.create().yup); // true (imported to the prototype)
+console.log(Class1.nope); // undefined (not imported since it's in the prototype of the "h" object)
+console.log(Class1.create().nope); // undefined (not imported since it's in the prototype of the "h" object)
+console.log(Class1.create().yep); // false (imported to the prototype since it's in the declaration of the "h" object)
+```
+
+#### Inherit from any existing Node.js class
+
+```js
+var MyEventClass = Class.define('MyEventEmitter', function(){
+  var base = this;
+  base.implement(require('events').EventEmitter); // inherit from EventEmitter
+
+  return {
+      construct: function(){
+          var self = this;
+          process.nextTick(function(){
+              self.emit('created', base); // we can use it in construct already!
+          });
+      }
+  };
+});
+
+MyEventClass.create().on('created', function(base){
+    expect(base).to.eql(MyEventClass);
+    expect(base.prototype.on).to.be.a('function');
 });
 ```
 
 ### Encapsulate logic by passing a closure
 
 ```js
-Bird.include(function($super){ // $super is the Animal prototype (the parent), it contains only "construct" and "getName" per definitions above
-    var timesBeaked = 0;
-    // "this" refers to the current Class definition, that is, Bird, so you can access
-    // static variables plus the prototype, before it's [re]defined
-    //
-    // this.prototype.getName();
-    // this.count
-    //
-    // you may want to set var self = this; for usage inside the functions
-    return {
-        beak: function(){
-            return ++timesBeaked;
-        }
-    };
+Bird.include(function ($super){ // $super is the Animal prototype (the parent), it contains only "construct" and "getName" per definitions above
+  var timesBeaked = 0;
+  // "this" refers to the current Class definition, that is, Bird, so you can access
+  // static variables plus the prototype, before it's [re]defined
+  //
+  // this.prototype.getName();
+  // this.count
+  //
+  // you may want to set var self = this; for usage inside the functions
+  return {
+    beak: function (){
+      return ++timesBeaked;
+    }
+  };
 });
 
-Bird.implement(function($super){ // $super is the Animal class itself (the parent)
-    // "this" refers to the current Class definition, the same way it happens
-    // when extending the prototype (using include), you may access this.prototype in
-    // here as well
-    return {
-        catalog: function(){ // Bird.catalog() is now available
+Bird.implement(function ($super){ // $super is the Animal class itself (the parent)
+  // "this" refers to the current Class definition, the same way it happens
+  // when extending the prototype (using include), you may access this.prototype in
+  // here as well
+  var catalog = {};
+  return {
+    catalog: function (bird){ // Bird.catalog() is now available
+      if (arguments.length) {
+        for(var i = 0; i < arguments.length; i++) {
+          catalog[arguments[i].name] = arguments[i];
         }
-    };
+      }
+      return catalog;
+    }
+  };
 });
 ```
 
@@ -168,6 +245,8 @@ Dog.run(); // Dog.ran is now 40, Animal.ran and Cat.ran are now 20
 ```js
 var animal = Animal.create("An Animal");
 var bird = Bird.create("A Bird");
+var bird2 = Bird("Another bird");
+var bird3 = new Bird("Also a bird");
 ```
 
 ### Checking instances
@@ -208,7 +287,7 @@ var NewClass = Class.define('NewClass', {}, [Class1, Class2, Class3]);
 
 // or using NewClass.implement([Class1, Class2, Class3]);
 
-Class1.done = false;
+Class1.done = false; // Changing the base classes doesn't change the mixin'd class
 
 console.log(NewClass.done); // true
 console.log(NewClass.yet); // true
@@ -217,13 +296,11 @@ console.log(NewClass.$implements); // [Class1,Class2,Class3]
 console.log(NewClass.create().func()); // true
 console.log(NewClass.create().$class.done); // true
 
-// Changing the base classes doesn't change the mixin'd class
-
 // This mix in class methods as prototypes
 NewClass = Class.define('NewClass', [Class1, Class2, Class3]);
 
 console.log(NewClass.create().yet); // true
-console.log(NewClass.create().done); // true
+console.log(NewClass.create().done); // false
 console.log(NewClass.create().func); // undefined
 ```
 
@@ -364,6 +441,17 @@ Check how this library perform on your machine
 $ npm install && node test/benchmark.js
 ```
 
+A benchmark result in a 1st gen Core i3:
+
+```
+class instance function call x 436,567 ops/sec ±0.52% (96 runs sampled)
+class method function call x 102,911,115 ops/sec ±6.15% (35 runs sampled)
+class instance included function call x 427,565 ops/sec ±0.68% (95 runs sampled)
+$super instance function calls x 226,864 ops/sec ±3.15% (82 runs sampled)
+$super class function calls x 10,886,846 ops/sec ±0.87% (94 runs sampled)
+$super inherited two levels deep function calls x 5,180,118 ops/sec ±1.07% (94 runs sampled)
+class instantiation x 431,101 ops/sec ±0.60% (97 runs sampled)
+```
 
 ## Feeback
 -----------

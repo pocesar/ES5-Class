@@ -4,8 +4,7 @@ var
   Animal, Bird, Dog, Beagle, Color, Privat, animal, beagle, bird, dog, color, privat, privat2;
 
 module.exports = {
-  beforeEach: function (){
-    console.log(Object.setPrototypeOf);
+  before: function (){
     Animal = Class.define(
       'Animal',
       {
@@ -162,10 +161,40 @@ module.exports = {
   },
 
   ES5Class: {
+    testOldSchoolNewOperator: function(){
+      var NewCls, Cls = Class.define('Cls', {
+        construct: function(test){
+          this.test = test;
+        }
+      }), cls = new Cls('new'), obj = {
+        called: function(called){
+          return this.test + ': ' + called;
+        }
+      };
+
+      expect(cls.test).to.equal('new');
+
+      Cls.include(obj);
+
+      expect(cls.called('yes')).to.equal('new: yes');
+
+      NewCls = Cls.define('NewCls', {
+        called: function(){
+          return this.$super('no');
+        }
+      });
+
+      expect((new NewCls('yes')).called()).to.equal('yes: no');
+    },
+    testVersion: function(){
+      expect(Class.$version).to.be.a('string');
+      expect(/.\..\../.test(Class.$version)).to.equal(true);
+    },
     testEnumerables: function(){
       var Cls = Class.define('Cls', {
         construct: function(name){
           this.name = name;
+          this.loaded = false;
         },
         isTrue: function(){
           return true;
@@ -177,7 +206,28 @@ module.exports = {
       });
 
       expect(Object.keys(Cls)).to.eql(['isFalse']);
-      expect(Object.keys(Cls('name'))).to.eql(['name']);
+      expect(Object.keys(Cls('My Name'))).to.eql(['name','loaded']);
+    },
+    testNextTick: function(done){
+      var MyEventClass = Class.define('MyEventEmitter', function(){
+          var base = this;
+          base.implement(require('events').EventEmitter);
+
+          return {
+              construct: function(){
+                  var self = this;
+                  process.nextTick(function(){
+                      self.emit('created', base);
+                  });
+              }
+          };
+      });
+
+      MyEventClass.create().on('created', function(base){
+        expect(base).to.eql(MyEventClass);
+        expect(base.prototype.on).to.be.a('function');
+        done();
+      });
     },
     testDirectClassMixin: function(){
       var
@@ -193,10 +243,11 @@ module.exports = {
         Class2 = Class.define('Class2', Class1);
 
       expect(Class2.create().isTrue).to.be.an('undefined');
+      expect(Class2.isFalse).to.be.an('undefined');
       expect(Class2.create().isFalse()).to.equal(false);
       expect(Class2.$implements).to.eql([]);
 
-      Class2.implement(Class1);
+      Class2.implement([Class1]);
       expect(Class2.isFalse()).to.equal(false);
       expect(Class2.create().isTrue()).to.equal(true);
     },
@@ -270,9 +321,9 @@ module.exports = {
         }
       }), s = S('rofl');
 
+      expect(s).to.be.an('object');
       expect(S.create('lol').test()).to.equal('lol');
       expect(S('lmao').test('!')).to.equal('lmao!');
-      expect(s).to.be.an('object');
     },
     testImplementEventEmitter: function(done){
       var AlmostEmptyClass = Class.define('AlmostEmptyClass', {

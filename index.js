@@ -1,29 +1,48 @@
 /**
- * @version 0.8.0
+ * @version 1.0.0
  */
 'use strict';
 
 var
-  _hwp = Object.prototype.hasOwnProperty,
-  _ts = Object.prototype.toString,
-  _noop = function (){},
-  _spo = Object.setPrototypeOf || function (obj, proto){
+  hwp = Object.prototype.hasOwnProperty,
+  noop = function (){},
+  spo = Object.setPrototypeOf || function (obj, proto){
     obj.__proto__ = proto;
     return obj;
   },
-  _isArray = function (obj){
-    return obj && _ts.call(obj) === '[object Array]';
+  isArray = function (obj){
+    return obj && obj.constructor === Array;
   },
-  _isFunction = function (object){
-    return object && _ts.call(object) === '[object Function]';
+  isFunction = function (obj){
+    return obj && obj.constructor === Function;
   },
-  _isPlainFunction = function (object){
-    return _isFunction(object) &&
-      'prototype' in object && !('$class' in object) && !('$class' in object.prototype) &&
-      Object.keys(object.prototype).length === 0;
+  isPlainFunction = function (object){
+    return isFunction(object) &&
+      (object['prototype'] === undefined || Object.keys(object.prototype).length === 0) &&
+      object['$class'] === undefined;
   },
-  _hasSuperRegex = /\$super/,
-  _functionWrapper = function (key, obj, original){
+  splat = function(obj, func, args){
+    if (args.length) {
+      switch (args.length) {
+        case 1:
+          return obj[func](args[0]);
+        case 2:
+          return obj[func](args[0], args[1]);
+        case 3:
+          return obj[func](args[0], args[1], args[2]);
+        case 4:
+          return obj[func](args[0], args[1], args[2], args[3]);
+        case 5:
+          return obj[func](args[0], args[1], args[2], args[3], args[4]);
+        default:
+          return func.apply(obj, args);
+      }
+    } else {
+      return obj[func]();
+    }
+  },
+  hasSuperRegex = /\$super/,
+  functionWrapper = function (key, obj, original){
     /*
      performance gain:
      476% on Class method calls
@@ -36,7 +55,7 @@ var
      so only wrap it when needed
      */
 
-    if (!_hasSuperRegex.test(obj[key])) {
+    if (!hasSuperRegex.test(obj[key])) {
       return obj[key];
     }
     return function (){
@@ -45,10 +64,16 @@ var
       originalSuper = self.$super; // store current $super
 
       // if we have an original, it's a Class method call, otherwise, let's look for the parent, or use an empty function
-      self.$super = original || self.$parent[key] || _noop;
-      ret = obj[key].apply(self, arguments);
+      self.$super = original || self.$parent[key] || noop;
 
-      self.$super = originalSuper; // restore the upper $super
+      if (arguments.length) {
+       ret = obj[key].apply(self, arguments);
+      } else {
+        ret = obj[key].call(self);
+      }
+
+      // restore the upper $super
+      self.$super = originalSuper;
 
       return ret;
     };
@@ -61,7 +86,7 @@ var
     ES5Class = function ES5Class(){ };
 
 ES5Class.prototype = {
-  construct: _noop
+  construct: noop
 };
 
 /**
@@ -103,12 +128,19 @@ ES5Class.define = function (className, include, implement){
 
   object = function (){
     if (!(this instanceof object)) {
-      return object.create.apply(object, arguments);
+      // auto instantiation
+      return splat(object, 'create', arguments);
     }
+
+    // old school new operator, call the constructor
+    if (this.construct !== noop) {
+      splat(this, 'construct', arguments);
+    }
+
     return this;
   };
 
-  _spo(object, self);
+  spo(object, self);
 
   getClass = (function (Class){
     return function (){
@@ -119,10 +151,10 @@ ES5Class.define = function (className, include, implement){
   isClass = (function (object){
     return function (cls){
       return cls && object &&
-        'prototype' in cls &&
-        'prototype' in object &&
-        '$className' in cls &&
-        '$className' in object &&
+        cls['prototype'] !== undefined &&
+        object['prototype'] !== undefined &&
+        cls['$className'] !== undefined &&
+        object['$className'] !== undefined &&
         cls.$className === object.$className &&
         cls.prototype === object.prototype;
     };
@@ -199,8 +231,8 @@ ES5Class.create = function (){
     value: self.$parent.prototype
   });
 
-  if (typeof instance['construct'] === 'function' && instance.construct !== _noop) {
-    instance.construct.apply(instance, arguments);
+  if (instance.construct !== noop) {
+    splat(instance, 'construct', arguments);
   }
 
   return instance;
@@ -215,28 +247,28 @@ ES5Class.create = function (){
 ES5Class.include = function (obj){
   var self = this, wrap, newfunc;
 
-  if (typeof obj !== 'undefined' && obj !== null) {
-    if (_isArray(obj)) {
+  if (obj !== undefined && obj !== null) {
+    if (isArray(obj)) {
       for (var i = 0, len = obj.length; i < len; i++) {
         // An array of either a function, ES5Class or plain objects
         self.include(obj[i], true);
       }
     } else if (
-      _isPlainFunction(obj) &&
-        (typeof (newfunc = obj.call(self, self.$parent.prototype)) !== 'undefined')
-      ) {
+        isPlainFunction(obj) &&
+        (typeof (newfunc = obj.call(self, self.$parent.prototype)) === 'object')
+    ) {
       // Include the result of the closure if it's not null/undefined
       self.include(newfunc);
     } else {
       for (var key in obj) {
-        if (_hwp.call(obj, key)) {
-          if (typeof obj[key] !== 'undefined') {
-            if (typeof obj[key]['$class'] !== 'undefined') {
+        if (hwp.call(obj, key)) {
+          if (obj[key] !== undefined) {
+            if (obj[key]['$class'] !== undefined) {
               // ES5Class, start over
               self.include(obj[key]);
-            } else if (_isFunction(obj[key])) {
+            } else if (isFunction(obj[key])) {
               // Wrap function for $super
-              wrap = _functionWrapper(key, obj, _isFunction(self.prototype[key]) ? self.prototype[key] : _noop);
+              wrap = functionWrapper(key, obj, isFunction(self.prototype[key]) ? self.prototype[key] : noop);
 
               self.prototype[key] = wrap;
             } else {
@@ -262,40 +294,40 @@ ES5Class.include = function (obj){
 ES5Class.implement = function (obj){
   var self = this, func, newfunc;
 
-  if (typeof obj !== 'undefined' && obj !== null) {
-    if (_isArray(obj)) {
+  if (obj !== undefined && obj !== null) {
+    if (isArray(obj)) {
       // Classes/objects should be mixed in
       for (var i = 0, len = obj.length; i < len; i++) {
         self.implement(obj[i], true);
       }
     } else if (
-      _isPlainFunction(obj) &&
-        (typeof (newfunc = obj.call(self, self.$parent)) !== 'undefined')
-      ) {
+        isPlainFunction(obj) &&
+        (typeof (newfunc = obj.call(self, self.$parent)) === 'object')
+    ) {
       // Class should implement the closure result only
       // if the function returns something
       self.implement(newfunc);
     } else {
-      if ('$isClass' in obj &&
-        '$implements' in obj &&
-        _isArray(obj.$implements)
+      if (
+        obj['$implements'] !== undefined &&
+        isArray(obj.$implements)
         ) {
         // Keep track of mixin'd classes
         self.$implements.push(obj);
       }
 
       for (var key in obj) {
-        if (_hwp.call(obj, key)) {
+        if (hwp.call(obj, key)) {
           // hasOwnProperty key
-          if (typeof obj[key] !== 'undefined') {
+          if (obj[key] !== undefined) {
             if (key !== 'prototype') {
-              if (typeof obj[key]['$class'] !== 'undefined') {
+              if (obj[key]['$class'] !== undefined) {
                 // One of the members is a ES5Class
                 self.implement(obj[key]);
               } else {
-                if (_isFunction(obj[key])) {
+                if (isFunction(obj[key])) {
                   // Wrap the function for $super usage
-                  func = _functionWrapper(key, obj, _isFunction(self[key]) ? self[key] : _noop);
+                  func = functionWrapper(key, obj, isFunction(self[key]) ? self[key] : noop);
 
                   self[key] = func;
                 } else {
@@ -318,6 +350,13 @@ ES5Class.implement = function (obj){
 
   return self;
 };
+
+/**
+ * Current version
+ */
+Object.defineProperty(ES5Class, '$version', {
+  value:'1.0.0'
+});
 
 /**
  * Get the current class name.
@@ -354,10 +393,10 @@ Object.defineProperty(ES5Class.prototype, '$class', {
  */
 Object.defineProperty(ES5Class.prototype, '$instanceOf', {
   value: function (object){
-    return object && object.prototype && object.prototype.isPrototypeOf ? object.prototype.isPrototypeOf(this) : false;
+    return object && object.prototype && (object.prototype.isPrototypeOf ? object.prototype.isPrototypeOf(this) : false);
   }
 });
 
-if (typeof module !== 'undefined' && module.exports) {
+if (module !== undefined && module.exports) {
   module.exports = ES5Class;
 }

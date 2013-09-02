@@ -1,9 +1,10 @@
-## 0.8.0
+## 1.0.0
 
-* Version 0.8.0 got breaking API changes, because the behavior of mixins has changed (now properly applies instance and class methods separately)
+* Many minor performance tweaks (that in benchmarks are important) according to jsperf benchmarks
+* Version 1.0.0 got breaking API changes, because the behavior of mixins has changed (now properly applies instance and class methods separately)
 * Added more tests and made some changes to existing ones
-* This branch uses `__proto__`/`Object.setPrototypeOf` instead of `Object.create`, so the next item could happen
-* The class can be auto instantiated using `MyClass(instance, values)` instead of `MyClass.create(instance, values)`
+* This branch uses `__proto__`/`Object.setPrototypeOf` (when available) instead of `Object.create`, so the next change item could happen
+* The class can be auto instantiated using `MyClass(instance, values)`, `MyClass.create(instance, values)` and using the `new` operator
 
 ## 0.7.2
 

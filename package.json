@@ -1,6 +1,6 @@
 {
   "name": "es5class",
-  "version": "0.8.0",
+  "version": "1.0.0",
   "description": "Prototypal inheritance based on ES5 Object.create and Object.defineProperty for node.js only",
   "keywords" : [
     "es5",
@@ -15,7 +15,8 @@
     "object.defineProperty",
     "prototype",
     "__proto__",
-    "setPrototypeOf"
+    "setPrototypeOf",
+    "Object.setPrototypeOf"
   ],
   "repository": {
     "type": "git",
