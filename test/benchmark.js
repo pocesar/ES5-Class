@@ -134,21 +134,57 @@ suite
       base
     )
   )
-  .add('class instantiation', 
+  .add('class instantiation',
     util._extend({
-        setup: function() {
+        setup: function (){
           var Cls = this.args.Class.define('cls', {
-            vibrate: function(){
+            vibrate: function (){
               return true;
             }
           });
         },
-        fn: function(){
+        fn   : function (){
           var cls = Cls.create();
           cls.vibrate();
         }
       },
       base
     )
+  )
+  .add('new instantiation',
+    util._extend({
+        setup: function (){
+          var Cls = this.args.Class.define('Cls', {
+            construct: function(ret) {
+              this.ret = ret;
+            },
+            doIt: function(){
+              return this.ret;
+            }
+          });
+        },
+        fn   : function (){
+          (new Cls(true)).doIt();
+        }
+      },
+      base)
+  )
+  .add('Auto instantiation',
+    util._extend({
+        setup: function (){
+          var Cls = this.args.Class.define('Cls', {
+            construct: function(ret) {
+              this.ret = ret;
+            },
+            doIt: function(){
+              return this.ret;
+            }
+          });
+        },
+        fn   : function (){
+          Cls(true).doIt();
+        }
+      },
+      base)
   )
   .run();

@@ -1,5 +1,5 @@
 /**
- * @version 1.0.1
+ * @version 1.0.2
  */
 'use strict';
 
@@ -21,7 +21,16 @@ var
       (object['prototype'] === undefined || Object.keys(object.prototype).length === 0) &&
       object['$class'] === undefined;
   },
-  splat = function(obj, func, args){
+  superApply = function(self, object, args){
+    if (object.$apply.length) {
+      object.$apply.forEach(function (f){
+        // dirty little hack to make classes like Buffer think the prototype is instanceof itself
+        spo(self, f.prototype);
+        f.apply(self, args);
+      });
+    }
+  },
+  splat = function (obj, func, args){
     if (args.length) {
       switch (args.length) {
         case 1:
@@ -67,7 +76,7 @@ var
       self.$super = original || self.$parent[key] || noop;
 
       if (arguments.length) {
-       ret = obj[key].apply(self, arguments);
+        ret = obj[key].apply(self, arguments);
       } else {
         ret = obj[key].call(self);
       }
@@ -127,14 +136,18 @@ ES5Class.define = function (className, include, implement){
   }
 
   object = function (){
-    if (!(this instanceof object)) {
+    var self = this;
+
+    if (!(self instanceof object)) {
       // auto instantiation
       return splat(object, 'create', arguments);
     }
 
+    superApply(self, object, arguments);
+
     // old school new operator, call the constructor
-    if (this.construct !== noop) {
-      splat(this, 'construct', arguments);
+    if (self.construct && self.construct !== noop) {
+      splat(self, 'construct', arguments);
     }
 
     return this;
@@ -142,7 +155,7 @@ ES5Class.define = function (className, include, implement){
 
   spo(object, self);
 
-  getClass = (function (Class){
+  getClass = (function getClass(Class){
     return function (){
       return Class;
     };
@@ -173,8 +186,8 @@ ES5Class.define = function (className, include, implement){
         return object;
       })(self)
     },
-    '$apply': {
-      value: [],
+    '$apply'     : {
+      value   : [],
       writable: true
     },
     '$implements': {
@@ -190,23 +203,29 @@ ES5Class.define = function (className, include, implement){
     'prototype'  : {
       value: (function (prototype){
         return prototype;
-      })(Object.create(self.prototype))
-    }
-  });
-
-  Object.defineProperties(object.prototype, {
-    '$implements': {
-      'get': (function (object){
-        return function (){
-          return object.$implements;
-        };
-      })(object)
-    },
-    '$class'     : {
-      'get': getClass
-    },
-    '$isClass'   : {
-      value: isClass
+      })(Object.create(self.prototype, {
+          constructor  : {
+            get: getClass
+          },
+          '$implements': {
+            'get': (function (object){
+              return function (){
+                return object.$implements;
+              };
+            })(object)
+          },
+          '$parent'    : {
+            value: (function (object){
+              return object;
+            })(self.prototype)
+          },
+          '$class'     : {
+            'get': getClass
+          },
+          '$isClass'   : {
+            value: isClass
+          }
+        }))
     }
   });
 
@@ -229,19 +248,13 @@ ES5Class.define = function (className, include, implement){
 ES5Class.create = function (){
   var
     self = this,
-    instance = Object.create(self.prototype);
+    instance = Object.create(null);
 
-  Object.defineProperty(instance, '$parent', {
-    value: self.$parent.prototype
-  });
+  superApply(instance, self, arguments);
 
-  if (self.$apply.length) {
-    self.$apply.forEach(function(f){
-      f.apply(instance, arguments);
-    });
-  }
+  spo(instance, self.prototype);
 
-  if (instance.construct !== noop) {
+  if (instance.construct && instance.construct !== noop) {
     splat(instance, 'construct', arguments);
   }
 
@@ -261,12 +274,12 @@ ES5Class.include = function (obj){
     if (isArray(obj)) {
       for (var i = 0, len = obj.length; i < len; i++) {
         // An array of either a function, ES5Class or plain objects
-        self.include(obj[i], true);
+        self.include(obj[i]);
       }
     } else if (
-        isPlainFunction(obj) &&
+      isPlainFunction(obj) &&
         (typeof (newfunc = obj.call(self, self.$parent.prototype)) === 'object')
-    ) {
+      ) {
       // Include the result of the closure if it's not null/undefined
       self.include(newfunc);
     } else {
@@ -309,19 +322,19 @@ ES5Class.implement = function (obj, apply){
     if (isArray(obj)) {
       // Classes/objects should be mixed in
       for (var i = 0, len = obj.length; i < len; i++) {
-        self.implement(obj[i], true);
+        self.implement(obj[i], apply);
       }
     } else if (
-        isPlainFunction(obj) &&
+      isPlainFunction(obj) &&
         (typeof (newfunc = obj.call(self, self.$parent)) === 'object')
-    ) {
+      ) {
       // Class should implement the closure result only
       // if the function returns something
-      self.implement(newfunc);
+      self.implement(newfunc, apply);
     } else {
       if (
         obj['$implements'] !== undefined &&
-        isArray(obj.$implements)
+          isArray(obj.$implements)
         ) {
         // Keep track of mixin'd classes
         self.$implements.push(obj);
@@ -334,7 +347,7 @@ ES5Class.implement = function (obj, apply){
             if (key !== 'prototype') {
               if (obj[key]['$class'] !== undefined) {
                 // One of the members is a ES5Class
-                self.implement(obj[key]);
+                self.implement(obj[key], apply);
               } else {
                 if (isFunction(obj[key])) {
                   // Wrap the function for $super usage
@@ -369,7 +382,7 @@ ES5Class.implement = function (obj, apply){
  * Current version
  */
 Object.defineProperty(ES5Class, '$version', {
-  value:'1.0.1'
+  value: '1.0.2'
 });
 
 /**

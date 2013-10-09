@@ -25,6 +25,7 @@ Why should we write code like if we were in 2010? Read on!
 * The `construct` method is called with arguments when the class is instantiated
 * `$class` is available everywhere, it returns the current class, even before instantiation
 * You are free to instantiate your class using `Class.create(arguments)`, `Class(arguments)` and `new Class(arguments)`
+* It's freaking fast, check the benchmark seciton
 
 __Contributors__
 
@@ -470,13 +471,15 @@ $ npm install && node test/benchmark.js
 A benchmark result in a 1st gen Core i3:
 
 ```
-class instance function call x 436,567 ops/sec ±0.52% (96 runs sampled)
-class method function call x 102,911,115 ops/sec ±6.15% (35 runs sampled)
-class instance included function call x 427,565 ops/sec ±0.68% (95 runs sampled)
-$super instance function calls x 226,864 ops/sec ±3.15% (82 runs sampled)
-$super class function calls x 10,886,846 ops/sec ±0.87% (94 runs sampled)
-$super inherited two levels deep function calls x 5,180,118 ops/sec ±1.07% (94 runs sampled)
-class instantiation x 431,101 ops/sec ±0.60% (97 runs sampled)
+class instance function call x 1,647,283 ops/sec ±1.51% (85 runs sampled)
+class method function call x 102,133,644 ops/sec ±6.32% (38 runs sampled)
+class instance included function call x 1,543,751 ops/sec ±1.93% (87 runs sampled)
+$super instance function calls x 555,243 ops/sec ±4.02% (79 runs sampled)
+$super class function calls x 11,050,604 ops/sec ±0.46% (99 runs sampled)
+$super inherited two levels deep function calls x 5,293,003 ops/sec ±0.39% (99 runs sampled)
+class instantiation x 1,569,363 ops/sec ±1.92% (88 runs sampled)
+new instantiation x 6,345,677 ops/sec ±0.31% (95 runs sampled)
+Auto instantiation x 987,109 ops/sec ±0.96% (95 runs sampled)
 ```
 
 ## Feeback

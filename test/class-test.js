@@ -161,7 +161,7 @@ module.exports = {
   },
 
   ES5Class: {
-    testOldSchoolNewOperator: function(){
+    OldSchoolNewOperator: function(){
       var NewCls, Cls = Class.define('Cls', {
         construct: function(test){
           this.test = test;
@@ -185,12 +185,21 @@ module.exports = {
       });
 
       expect((new NewCls('yes')).called()).to.equal('yes: no');
+
+      var
+        NewBuffer = Class.define('NewBuffer').implement(Buffer, true),
+        newbuffer;
+
+      newbuffer = new NewBuffer(4);
+      expect(newbuffer.write).to.be.a('function');
+      expect(newbuffer.length).to.equal(4);
+      expect(newbuffer.write).to.throwException();
     },
-    testVersion: function(){
+    Version: function(){
       expect(Class.$version).to.be.a('string');
       expect(/.\..\../.test(Class.$version)).to.equal(true);
     },
-    testEnumerables: function(){
+    Enumerables: function(){
       var Cls = Class.define('Cls', {
         construct: function(name){
           this.name = name;
@@ -208,7 +217,7 @@ module.exports = {
       expect(Object.keys(Cls)).to.eql(['isFalse']);
       expect(Object.keys(Cls('My Name'))).to.eql(['name','loaded']);
     },
-    testNextTick: function(done){
+    NextTick: function(done){
       var MyEventClass = Class.define('MyEventEmitter', function(){
           var base = this;
           base.implement(require('events').EventEmitter, true);
@@ -234,7 +243,17 @@ module.exports = {
 
       expect(instance._events).to.be.an('object');
     },
-    testDirectClassMixin: function(){
+    InheritBuffer: function(){
+      var MyBuffer = Class.define('MyBuffer').implement(Buffer, true);
+
+      var buf = MyBuffer.create(4);
+
+      expect(MyBuffer.prototype.write).to.be.a('function');
+      expect(buf.parent).to.be.an('object');
+      expect(buf.write).to.be.a('function');
+      expect(buf.length).to.equal(4);
+    },
+    DirectClassMixin: function(){
       var
         Class1 = Class.define('Class1', {
           isTrue: function(){
@@ -256,7 +275,7 @@ module.exports = {
       expect(Class2.isFalse()).to.equal(false);
       expect(Class2.create().isTrue()).to.equal(true);
     },
-    testArrayImplementInclude: function(){
+    ArrayImplementInclude: function(){
       var Bases = [
         Class.define('Base1', {
           one: function(){
@@ -316,7 +335,7 @@ module.exports = {
       expect(Instance.create().three()).to.equal(false);
       expect(Instance.$implements).to.eql(Bases.slice(0, -1));
     },
-    testInstanceWithoutCreate: function(){
+    InstanceWithoutCreate: function(){
       var S = Class.define('S', {
         construct: function(lol){
           this.lol = lol;
@@ -330,7 +349,7 @@ module.exports = {
       expect(S.create('lol').test()).to.equal('lol');
       expect(S('lmao').test('!')).to.equal('lmao!');
     },
-    testImplementEventEmitter: function(done){
+    ImplementEventEmitter: function(done){
       var AlmostEmptyClass = Class.define('AlmostEmptyClass', {
         lambda: true
       });
@@ -351,7 +370,7 @@ module.exports = {
 
       aec.emit('true', true);
     },
-    testArrayMixin: function(){
+    ArrayMixin: function(){
       var Class1 = Class.define('Class1', {}, {done: true}),
           Class2 = Class.define('Class2', {func: function(){ return true; }}),
           Class3 = Class.define('Class3', {}, {yet: true});
@@ -383,7 +402,7 @@ module.exports = {
       expect(NewClass2.create().func()).to.equal(false);
       expect(NewClass2.done).to.equal(false);
     },
-    testClassAccesses: function(){
+    ClassAccesses: function(){
       var h = Class.define('Class', function(){
         return {
           done: function(){
@@ -413,7 +432,7 @@ module.exports = {
       expect(h.property).to.equal(true);
       expect(h.$className).to.equal('Class');
     },
-    testDuckTyping: function (){
+    DuckTyping: function (){
 
       var Op = Class.define('Op', {
         construct: function (number){
@@ -484,15 +503,15 @@ module.exports = {
       expect(Operation.onthefly([div, sum, mul, mul2])).to.equal(67500);
     },
 
-    testSingleton: function (){
+    Singleton: function (){
 
       var Test = Class.define('Test', {}, {
         test: function (){
-          return 'Test::test';
+          return 'Test::';
         }
       });
 
-      expect(Test.test()).to.equal('Test::test');
+      expect(Test.test()).to.equal('Test::');
 
       Test.implement({
         test: function (){
@@ -500,7 +519,7 @@ module.exports = {
         }
       });
 
-      expect(Test.test()).to.equal('New::Test::test');
+      expect(Test.test()).to.equal('New::Test::');
 
       Test.implement({
         test: function (){
@@ -508,11 +527,11 @@ module.exports = {
         }
       });
 
-      expect(Test.test()).to.equal('And::New::Test::test');
+      expect(Test.test()).to.equal('And::New::Test::');
 
       var NewTest = Test.define('NewTest');
 
-      expect(NewTest.test()).to.equal('And::New::Test::test');
+      expect(NewTest.test()).to.equal('And::New::Test::');
 
       NewTest.implement({
         test: function (){
@@ -520,12 +539,12 @@ module.exports = {
         }
       });
 
-      expect(Test.test()).to.equal('And::New::Test::test');
-      expect(NewTest.test()).to.equal('NewTest::And::New::Test::test');
+      expect(Test.test()).to.equal('And::New::Test::');
+      expect(NewTest.test()).to.equal('NewTest::And::New::Test::');
 
     },
 
-    testOverload: function (){
+    Overload: function (){
 
       var ES5Person = Class.define('ES5Person', {
         construct : function (name){
@@ -563,7 +582,7 @@ module.exports = {
 
     },
 
-    testClassDefine: function (){
+    ClassDefine: function (){
       expect(function (){
         Class.define();
       }).to.throwException();
@@ -572,7 +591,7 @@ module.exports = {
       expect(Class.define('SubClass', {}, {})).to.be.ok();
     },
 
-    testClasses: function (){
+    Classes: function (){
       expect(Animal).to.be.ok();
       expect(Bird).to.be.ok();
       expect(Dog).to.be.ok();
@@ -581,7 +600,7 @@ module.exports = {
       expect(Privat).to.be.ok();
     },
 
-    testInstances: function (){
+    Instances: function (){
       expect(animal).to.be.ok();
       expect(bird).to.be.ok();
       expect(dog).to.be.ok();
@@ -589,7 +608,7 @@ module.exports = {
       expect(privat).to.be.ok();
     },
 
-    testClassProperties: function (){
+    ClassProperties: function (){
 
       expect(Animal.count).to.equal(2);
       expect(Animal.$implements).to.eql([]);
@@ -608,7 +627,7 @@ module.exports = {
 
     },
 
-    testInstanceProperties: function (){
+    InstanceProperties: function (){
 
       expect(animal.name).to.equal('An Animal');
       expect(animal.$implements).to.eql([]);
@@ -628,7 +647,7 @@ module.exports = {
 
     },
 
-    testInstanceOf: function (){
+    InstanceOf: function (){
 
       expect(animal.$instanceOf).to.be.ok();
       expect(privat.$instanceOf).to.be.ok();
@@ -638,7 +657,7 @@ module.exports = {
 
     },
 
-    testIsClass: function (){
+    IsClass: function (){
 
       expect(animal.$isClass(Animal)).to.be.ok();
       expect(animal.$isClass(Class)).not.to.be.ok();
@@ -647,38 +666,47 @@ module.exports = {
 
     },
 
-    testInheritance: function (){
+    Inheritance: function (){
 
-      expect(animal.$instanceOf(Animal)).to.be.ok();
-      expect(animal.$instanceOf(Class)).to.be.ok();
-      expect(animal.$instanceOf(Bird)).not.to.be.ok();
+      expect(animal.$instanceOf(Animal)).to.equal(true);
+      expect(animal instanceof Animal).to.equal(true);
+      expect(animal.$instanceOf(Class)).to.equal(true);
+      expect(animal instanceof Class).to.equal(true);
+      expect(animal.$instanceOf(Bird)).to.equal(false);
+      expect(animal instanceof Bird).to.equal(false);
 
-      expect(bird.$instanceOf(Bird)).to.be.ok();
-      expect(bird.$instanceOf(Animal)).to.be.ok();
-      expect(bird.$instanceOf(Class)).to.be.ok();
+      expect(bird.$instanceOf(Bird)).to.equal(true);
+      expect(bird instanceof Bird).to.equal(true);
+      expect(bird.$instanceOf(Animal)).to.equal(true);
+      expect(bird instanceof Animal).to.equal(true);
+      expect(bird.$instanceOf(Class)).to.equal(true);
 
-      expect(dog.$instanceOf(Dog)).to.be.ok();
-      expect(dog.$instanceOf(Class)).to.be.ok();
-      expect(dog.$instanceOf(Animal)).to.be.ok();
-      expect(dog.$instanceOf(Bird)).not.to.be.ok();
+      expect(dog.$instanceOf(Dog)).to.equal(true);
+      expect(dog instanceof Dog).to.equal(true);
+      expect(dog.$instanceOf(Class)).to.equal(true);
+      expect(dog instanceof Class).to.equal(true);
+      expect(dog.$instanceOf(Animal)).to.equal(true);
+      expect(dog instanceof Animal).to.equal(true);
+      expect(dog.$instanceOf(Bird)).to.equal(false);
+      expect(dog instanceof Bird).to.equal(false);
 
-      expect(beagle.$instanceOf(Beagle)).to.be.ok();
-      expect(beagle.$instanceOf(Class)).to.be.ok();
-      expect(beagle.$instanceOf(Dog)).not.to.be.ok();
-      expect(beagle.$instanceOf(Animal)).to.be.ok();
-      expect(beagle.$instanceOf(Bird)).not.to.be.ok();
-      expect(beagle.$instanceOf(Color)).not.to.be.ok();
+      expect(beagle.$instanceOf(Beagle)).to.equal(true);
+      expect(beagle.$instanceOf(Class)).to.equal(true);
+      expect(beagle.$instanceOf(Dog)).to.equal(false);
+      expect(beagle.$instanceOf(Animal)).to.equal(true);
+      expect(beagle.$instanceOf(Bird)).to.equal(false);
+      expect(beagle.$instanceOf(Color)).to.equal(false);
 
     },
 
-    testInheritedMethods: function (){
+    InheritedMethods: function (){
       expect(bird.getName).to.be.ok();
       expect(bird.getName()).to.equal('A Bird');
       expect(dog.cry()).to.equal('wof!');
       expect(beagle.cry()).to.equal('wof!');
     },
 
-    testExtendingBase: function(){
+    ExtendingBase: function(){
       var Base = Class.define('Base', {
         done: function(){
           this.$class.count++;
@@ -752,7 +780,7 @@ module.exports = {
       expect(Next.other()).to.equal(false);
     },
 
-    testClosureParentMethod: function(){
+    ClosureParentMethod: function(){
       var Clss = Class.define('Clss', {}, function(){
         return {
           factory: function(oval){
@@ -787,7 +815,7 @@ module.exports = {
       expect(Cls.factory().oval).to.equal(false);
     },
 
-    testClosureParentInstance: function(){
+    ClosureParentInstance: function(){
 
       var Clss = Class.define('Clss', function(){
         return {
@@ -812,7 +840,7 @@ module.exports = {
       expect(Clsss.create(true).oval).to.be(true);
     },
 
-    testClosures: function(){
+    Closures: function(){
       var Count = Class.define('Count', {}, {
         count: 0
       });
@@ -846,7 +874,7 @@ module.exports = {
       expect(one.data()).to.eql({'dub': false, 'bleh': [1,2,3]});
     },
 
-    testClassNames: function (){
+    ClassNames: function (){
 
       expect(Class.$className).to.equal('ES5Class');
       expect(Animal.$className).to.equal('Animal');
@@ -865,7 +893,7 @@ module.exports = {
 
     },
 
-    testPrivateAndDataShare: function (){
+    PrivateAndDataShare: function (){
 
       expect(privat.items().length).to.equal(4);
       expect(privat.items()).to.eql([1, 2, 3, 4]);
@@ -892,7 +920,7 @@ module.exports = {
 
     },
 
-    testUseStrict: function (){
+    UseStrict: function (){
       'use strict';
 
       /*
@@ -914,7 +942,7 @@ module.exports = {
 
     },
 
-    testProtectedMethods: function (){
+    ProtectedMethods: function (){
 
       var temp = bird.$class.$className;
       bird.$class.$className = 'trying to modify className';
@@ -930,7 +958,7 @@ module.exports = {
 
     },
 
-    testConstructor: function (){
+    Constructor: function (){
       expect(typeof Bird).to.be('function');
       expect(Bird.create).to.be.a('function');
     }

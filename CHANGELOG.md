@@ -1,3 +1,11 @@
+## 1.0.2
+
+* Fix `implement` code for arrays
+* Inheritance now works with classes like Node.js `Buffer`, that has auto instantiation code, without the need of using `new` operator
+* The `new` operator was missing some steps, needed to replicate `ES5Class.create` code
+* More tests regarding the `new` operator, should be enough for now
+* Performance went through the roof with more optimizations
+
 ## 1.0.1
 
 * `implement` can now apply node.js native instance super calls, by passing true as the second argument, automatically

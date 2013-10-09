@@ -1,4 +1,4 @@
---reporter list
+--reporter spec
 --ui exports
 --check-leaks
 --debug-brk
