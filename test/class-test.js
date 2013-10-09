@@ -345,7 +345,6 @@ module.exports = {
         done();
       });
 
-      expect(aec._maxListeners).to.be.a('number');
       expect(aec._events).to.be.an('object');
 
       aec.emit('true', true);
