@@ -129,8 +129,10 @@ You can all the inheriting class construct by passing the second parameter, for 
 ```js
 var EventEmitter = require('events').EventEmitter;
 
-// this is the same as
+// this code is the same as
 Class.define('MyEventEmitter', function(){
+    this.implement(EventEmitter);
+
     return {
         construct: function(){
             EventEmitter.call(this);
@@ -138,8 +140,12 @@ Class.define('MyEventEmitter', function(){
     };
 });
 
-// this
+// this one (much cleaner)
 Class.define('MyEventEmitter').implement(EventEmitter, true);
+
+// There's no need for the construct + implement if you are just creating an inheritance from another Node.js class
+// So it's easier to set the second parameter of implement to true, it will call the parent class constructor
+// automatically
 ```
 
 Because it's really easy to forget to initialize the inheriting class

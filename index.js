@@ -1,5 +1,5 @@
 /**
- * @version 1.0.0
+ * @version 1.0.1
  */
 'use strict';
 
@@ -368,7 +368,7 @@ ES5Class.implement = function (obj, apply){
  * Current version
  */
 Object.defineProperty(ES5Class, '$version', {
-  value:'1.0.0'
+  value:'1.0.1'
 });
 
 /**
