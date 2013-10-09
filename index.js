@@ -173,6 +173,10 @@ ES5Class.define = function (className, include, implement){
         return object;
       })(self)
     },
+    '$apply': {
+      value: [],
+      writable: true
+    },
     '$implements': {
       value   : [],
       writable: true
@@ -230,6 +234,12 @@ ES5Class.create = function (){
   Object.defineProperty(instance, '$parent', {
     value: self.$parent.prototype
   });
+
+  if (self.$apply.length) {
+    self.$apply.forEach(function(f){
+      f.apply(instance, arguments);
+    });
+  }
 
   if (instance.construct !== noop) {
     splat(instance, 'construct', arguments);
@@ -291,7 +301,7 @@ ES5Class.include = function (obj){
  *
  * @return ES5Class
  */
-ES5Class.implement = function (obj){
+ES5Class.implement = function (obj, apply){
   var self = this, func, newfunc;
 
   if (obj !== undefined && obj !== null) {
@@ -341,6 +351,9 @@ ES5Class.implement = function (obj){
       }
 
       if (obj.prototype) {
+        if (apply) {
+          self.$apply.push(obj);
+        }
         // Current object has a prototype (be it a ES5Class or not), let's
         // include them in our class definition
         self.include(obj.prototype);

@@ -1,3 +1,7 @@
+## 1.0.1
+
+* `implement` can now apply node.js native instance super calls, by passing true as the second argument, automatically
+
 ## 1.0.0
 
 * Many minor performance tweaks (that in benchmarks are important) according to jsperf benchmarks

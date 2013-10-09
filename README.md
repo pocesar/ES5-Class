@@ -124,6 +124,26 @@ console.log(Class1.yup); // true (imported to the class declaration)
 console.log(Class1.create().nope); // false (imported to the prototype)
 ```
 
+You can all the inheriting class construct by passing the second parameter, for example:
+
+```js
+var EventEmitter = require('events').EventEmitter;
+
+// this is the same as
+Class.define('MyEventEmitter', function(){
+    return {
+        construct: function(){
+            EventEmitter.call(this);
+        }
+    };
+});
+
+// this
+Class.define('MyEventEmitter').implement(EventEmitter, true);
+```
+
+Because it's really easy to forget to initialize the inheriting class
+
 ### Include
 
 ```js

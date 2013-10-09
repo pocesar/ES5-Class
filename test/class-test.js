@@ -211,11 +211,12 @@ module.exports = {
     testNextTick: function(done){
       var MyEventClass = Class.define('MyEventEmitter', function(){
           var base = this;
-          base.implement(require('events').EventEmitter);
+          base.implement(require('events').EventEmitter, true);
 
           return {
               construct: function(){
                   var self = this;
+
                   process.nextTick(function(){
                       self.emit('created', base);
                   });
@@ -228,6 +229,8 @@ module.exports = {
         expect(base.prototype.on).to.be.a('function');
         done();
       });
+
+      expect(MyEventClass.create()._events).to.be.an('object');
     },
     testDirectClassMixin: function(){
       var
@@ -330,7 +333,7 @@ module.exports = {
         lambda: true
       });
 
-      AlmostEmptyClass.implement(require('events').EventEmitter);
+      AlmostEmptyClass.implement(require('events').EventEmitter, true);
 
       var aec = AlmostEmptyClass.create();
 
@@ -341,6 +344,9 @@ module.exports = {
         expect(value).to.equal(true);
         done();
       });
+
+      expect(aec._maxListeners).to.be.a('number');
+      expect(aec._events).to.be.an('object');
 
       aec.emit('true', true);
     },
