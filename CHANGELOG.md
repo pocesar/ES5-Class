@@ -5,6 +5,7 @@
 * The `new` operator was missing some steps, needed to replicate `ES5Class.create` code
 * More tests regarding the `new` operator, should be enough for now
 * Performance went through the roof with more optimizations
+* Fix `Object.create(null)` for node 0.11 bug
 
 ## 1.0.1
 

@@ -5,7 +5,7 @@
 
 var
   hwp = Object.prototype.hasOwnProperty,
-  noop = function (){},
+  noop = function noop(){},
   spo = Object.setPrototypeOf || function (obj, proto){
     obj.__proto__ = proto;
     return obj;
@@ -248,7 +248,7 @@ ES5Class.define = function (className, include, implement){
 ES5Class.create = function (){
   var
     self = this,
-    instance = Object.create(null);
+    instance = Object.create(Object.prototype);
 
   superApply(instance, self, arguments);
 

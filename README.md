@@ -25,7 +25,7 @@ Why should we write code like if we were in 2010? Read on!
 * The `construct` method is called with arguments when the class is instantiated
 * `$class` is available everywhere, it returns the current class, even before instantiation
 * You are free to instantiate your class using `Class.create(arguments)`, `Class(arguments)` and `new Class(arguments)`
-* It's freaking fast, check the benchmark seciton
+* It's freaking fast, check the benchmark section
 
 __Contributors__
 

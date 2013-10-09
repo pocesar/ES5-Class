@@ -193,7 +193,6 @@ module.exports = {
       newbuffer = new NewBuffer(4);
       expect(newbuffer.write).to.be.a('function');
       expect(newbuffer.length).to.equal(4);
-      expect(newbuffer.write).to.throwException();
     },
     Version: function(){
       expect(Class.$version).to.be.a('string');
@@ -215,7 +214,7 @@ module.exports = {
       });
 
       expect(Object.keys(Cls)).to.eql(['isFalse']);
-      expect(Object.keys(Cls('My Name'))).to.eql(['name','loaded']);
+      expect(Object.keys(new Cls('My Name'))).to.eql(['name','loaded']);
     },
     NextTick: function(done){
       var MyEventClass = Class.define('MyEventEmitter', function(){
