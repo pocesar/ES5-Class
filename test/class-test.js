@@ -224,13 +224,15 @@ module.exports = {
           };
       });
 
-      MyEventClass.create().on('created', function(base){
+      var instance = MyEventClass.create();
+
+      instance.on('created', function(base){
         expect(base).to.eql(MyEventClass);
         expect(base.prototype.on).to.be.a('function');
         done();
       });
 
-      expect(MyEventClass.create()._events).to.be.an('object');
+      expect(instance._events).to.be.an('object');
     },
     testDirectClassMixin: function(){
       var
