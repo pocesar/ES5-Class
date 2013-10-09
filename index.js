@@ -116,7 +116,7 @@ ES5Class.prototype = {
  * </pre>
  *
  * @throws Error
- * @return ES5Class
+ * @return {ES5Class}
  */
 ES5Class.define = function (className, include, implement){
   var
@@ -224,7 +224,7 @@ ES5Class.define = function (className, include, implement){
  * Create a new instance of your class
  *
  * @instance
- * @return ES5Class
+ * @return {ES5Class}
  */
 ES5Class.create = function (){
   var
@@ -252,7 +252,7 @@ ES5Class.create = function (){
  *
  * @param {Object|Function} obj The definition object or closure
  *
- * @return ES5Class
+ * @return {ES5Class}
  */
 ES5Class.include = function (obj){
   var self = this, wrap, newfunc;
@@ -298,8 +298,9 @@ ES5Class.include = function (obj){
  * Add, override or overload static methods to the class
  *
  * @param {Object|Function} obj The definition object or closure
+ * @param {Boolean} apply When implementing other Node.js classes, you can automatically apply their constructors by passing true to this parameter
  *
- * @return ES5Class
+ * @return {ES5Class}
  */
 ES5Class.implement = function (obj, apply){
   var self = this, func, newfunc;
