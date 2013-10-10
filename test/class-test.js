@@ -187,12 +187,17 @@ module.exports = {
       expect((new NewCls('yes')).called()).to.equal('yes: no');
 
       var
-        NewBuffer = Class.define('NewBuffer').implement(Buffer, true),
+        NewBuffer = Class.define('NewBuffer', {
+          test: function(){
+            return true;
+          }
+        }).implement(Buffer, true),
         newbuffer;
 
       newbuffer = new NewBuffer(4);
       expect(newbuffer.write).to.be.a('function');
       expect(newbuffer.length).to.equal(4);
+      expect(newbuffer.test()).to.equal(true);
     },
     Version: function(){
       expect(Class.$version).to.be.a('string');
@@ -251,6 +256,8 @@ module.exports = {
       expect(buf.parent).to.be.an('object');
       expect(buf.write).to.be.a('function');
       expect(buf.length).to.equal(4);
+
+      expect((new MyBuffer(4)).parent).to.be.an('object');
     },
     DirectClassMixin: function(){
       var

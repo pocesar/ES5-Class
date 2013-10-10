@@ -471,15 +471,15 @@ $ npm install && node test/benchmark.js
 A benchmark result in a 1st gen Core i3:
 
 ```
-class instance function call x 1,647,283 ops/sec ±1.51% (85 runs sampled)
-class method function call x 102,133,644 ops/sec ±6.32% (38 runs sampled)
-class instance included function call x 1,543,751 ops/sec ±1.93% (87 runs sampled)
-$super instance function calls x 555,243 ops/sec ±4.02% (79 runs sampled)
-$super class function calls x 11,050,604 ops/sec ±0.46% (99 runs sampled)
-$super inherited two levels deep function calls x 5,293,003 ops/sec ±0.39% (99 runs sampled)
-class instantiation x 1,569,363 ops/sec ±1.92% (88 runs sampled)
-new instantiation x 6,345,677 ops/sec ±0.31% (95 runs sampled)
-Auto instantiation x 987,109 ops/sec ±0.96% (95 runs sampled)
+class instance function call x 1,665,036 ops/sec ±1.66% (87 runs sampled)
+class method function call x 97,118,577 ops/sec ±3.03% (53 runs sampled)
+class instance included function call x 1,670,364 ops/sec ±1.75% (88 runs sampled)
+$super instance function calls x 544,775 ops/sec ±3.90% (77 runs sampled)
+$super class function calls x 10,840,820 ops/sec ±0.50% (95 runs sampled)
+$super inherited two levels deep function calls x 5,267,939 ops/sec ±0.36% (100 runs sampled)
+class instantiation x 1,283,227 ops/sec ±1.44% (92 runs sampled)
+new instantiation x 2,939,065 ops/sec ±1.30% (95 runs sampled)
+Auto instantiation x 1,248,313 ops/sec ±1.28% (92 runs sampled)
 ```
 
 ## Feeback

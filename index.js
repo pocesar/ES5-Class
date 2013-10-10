@@ -5,7 +5,7 @@
 
 var
   hwp = Object.prototype.hasOwnProperty,
-  noop = function noop(){},
+  noop = function(){},
   spo = Object.setPrototypeOf || function (obj, proto){
     obj.__proto__ = proto;
     return obj;
@@ -21,33 +21,33 @@ var
       (object['prototype'] === undefined || Object.keys(object.prototype).length === 0) &&
       object['$class'] === undefined;
   },
-  superApply = function(self, object, args){
+  superApply = function(instance, object, args){
     if (object.$apply.length) {
       object.$apply.forEach(function (f){
         // dirty little hack to make classes like Buffer think the prototype is instanceof itself
-        spo(self, f.prototype);
-        f.apply(self, args);
+        spo(instance, f.prototype);
+        f.apply(instance, args);
       });
     }
   },
-  splat = function (obj, func, args){
-    if (args.length) {
+  splat = function (obj, context, args){
+    if (args.length > 0) {
       switch (args.length) {
         case 1:
-          return obj[func](args[0]);
+          return obj[context](args[0]);
         case 2:
-          return obj[func](args[0], args[1]);
+          return obj[context](args[0], args[1]);
         case 3:
-          return obj[func](args[0], args[1], args[2]);
+          return obj[context](args[0], args[1], args[2]);
         case 4:
-          return obj[func](args[0], args[1], args[2], args[3]);
+          return obj[context](args[0], args[1], args[2], args[3]);
         case 5:
-          return obj[func](args[0], args[1], args[2], args[3], args[4]);
+          return obj[context](args[0], args[1], args[2], args[3], args[4]);
         default:
-          return func.apply(obj, args);
+          return obj[context].apply(context, args);
       }
     } else {
-      return obj[func]();
+      return obj[context]();
     }
   },
   hasSuperRegex = /\$super/,
@@ -136,18 +136,18 @@ ES5Class.define = function (className, include, implement){
   }
 
   object = function (){
-    var self = this;
-
-    if (!(self instanceof object)) {
+    if (!(this instanceof object)) {
       // auto instantiation
       return splat(object, 'create', arguments);
     }
 
-    superApply(self, object, arguments);
+    superApply(this, object, arguments);
+
+    spo(this, object.prototype); // always need to restore prototype after superApply
 
     // old school new operator, call the constructor
-    if (self.construct && self.construct !== noop) {
-      splat(self, 'construct', arguments);
+    if (this.construct && this.construct !== noop) {
+      splat(this, 'construct', arguments);
     }
 
     return this;
@@ -155,7 +155,7 @@ ES5Class.define = function (className, include, implement){
 
   spo(object, self);
 
-  getClass = (function getClass(Class){
+  getClass = (function (Class){
     return function (){
       return Class;
     };
@@ -252,7 +252,7 @@ ES5Class.create = function (){
 
   superApply(instance, self, arguments);
 
-  spo(instance, self.prototype);
+  spo(instance, self.prototype); // always need to restore prototype after superApply
 
   if (instance.construct && instance.construct !== noop) {
     splat(instance, 'construct', arguments);
