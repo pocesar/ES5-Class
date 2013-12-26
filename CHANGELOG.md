@@ -1,3 +1,8 @@
+## 1.0.3
+* Fix getter and setters by using getOwnPropertyDescriptor (__defineGetter__ and __defineSetter__)
+* Fix crash when trying to call an object as a parent constructor
+* Fix edge case where other classes were using __proto__ and it wasn't being imported to the prototype
+
 ## 1.0.2
 
 * Fix `implement` code for arrays

@@ -456,7 +456,7 @@ For a lot of class examples (inheritance, extending, singletons, etc), check the
 The tests are ran using [mocha](https://github.com/visionmedia/mocha)
 
 ```bash
-$ npm install && npm test
+$ npm install && npm run test
 ```
 
 ## Benchmark
@@ -465,7 +465,7 @@ $ npm install && npm test
 Check how this library perform on your machine
 
 ```bash
-$ npm install && node test/benchmark.js
+$ npm install && npm run benchmark
 ```
 
 A benchmark result in a 1st gen Core i3:

@@ -1,6 +1,6 @@
 {
   "name": "es5class",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Prototypal inheritance based on ES5 Object.create and Object.defineProperty for node.js only",
   "keywords" : [
     "es5",
@@ -33,6 +33,7 @@
     "benchmark": "~1.0.0"
   },
   "scripts": {
-    "test": "jshint index.js test/class-test.js && mocha test/class-test.js"
+    "test": "jshint index.js test/class-test.js && mocha test/class-test.js",
+    "benchmark": "node test/benchmark.js"
   }
 }

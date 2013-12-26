@@ -5,6 +5,7 @@
 
 var
   hwp = Object.prototype.hasOwnProperty,
+  gpd = Object.getOwnPropertyDescriptor,
   noop = function(){},
   spo = Object.setPrototypeOf || function (obj, proto){
     obj.__proto__ = proto;
@@ -24,9 +25,11 @@ var
   superApply = function(instance, object, args){
     if (object.$apply.length) {
       object.$apply.forEach(function (f){
-        // dirty little hack to make classes like Buffer think the prototype is instanceof itself
-        spo(instance, f.prototype);
-        f.apply(instance, args);
+        if (f.apply) {
+          // dirty little hack to make classes like Buffer think the prototype is instanceof itself
+          spo(instance, f.prototype);
+          f.apply(instance, args);
+        }
       });
     }
   },
@@ -316,7 +319,7 @@ ES5Class.include = function (obj){
  * @return {ES5Class}
  */
 ES5Class.implement = function (obj, apply){
-  var self = this, func, newfunc;
+  var self = this, func, newfunc, descriptor;
 
   if (obj !== undefined && obj !== null) {
     if (isArray(obj)) {
@@ -341,31 +344,34 @@ ES5Class.implement = function (obj, apply){
       }
 
       for (var key in obj) {
-        if (hwp.call(obj, key)) {
-          // hasOwnProperty key
-          if (obj[key] !== undefined) {
-            if (key !== 'prototype') {
-              if (obj[key]['$class'] !== undefined) {
-                // One of the members is a ES5Class
-                self.implement(obj[key], apply);
-              } else {
-                if (isFunction(obj[key])) {
-                  // Wrap the function for $super usage
-                  func = functionWrapper(key, obj, isFunction(self[key]) ? self[key] : noop);
+        descriptor = gpd(obj, key);
+        if (descriptor !== undefined && (descriptor.set || descriptor.get)){
+          Object.defineProperty(self, key, {
+            get: descriptor.get,
+            set: descriptor.set
+          });
+        } else if (obj[key] !== undefined) {
+          if (key !== 'prototype' && key !== '__proto__') {
+            if (obj[key]['$class'] !== undefined) {
+              // One of the members is a ES5Class
+              self.implement(obj[key], apply);
+            } else {
+              if (isFunction(obj[key])) {
+                // Wrap the function for $super usage
+                func = functionWrapper(key, obj, isFunction(self[key]) ? self[key] : noop);
 
-                  self[key] = func;
-                } else {
-                  // Not a function, just copy the value
-                  self[key] = obj[key];
-                }
+                self[key] = func;
+              } else {
+                // Not a function, just copy the value
+                self[key] = obj[key];
               }
             }
           }
         }
       }
 
-      if (obj.prototype) {
-        if (apply) {
+      if (obj.prototype !== undefined) {
+        if (apply && self.$apply.indexOf(obj) === -1) {
           self.$apply.push(obj);
         }
         // Current object has a prototype (be it a ES5Class or not), let's
@@ -382,7 +388,7 @@ ES5Class.implement = function (obj, apply){
  * Current version
  */
 Object.defineProperty(ES5Class, '$version', {
-  value: '1.0.2'
+  value: '1.0.3'
 });
 
 /**

@@ -161,6 +161,30 @@ module.exports = {
   },
 
   ES5Class: {
+    ImportGettersAndSetters: function(){
+      var http = require('http');
+      var obj = {
+        __proto__: http.IncomingMessage.prototype
+      };
+
+      obj.__defineGetter__('testGetter', function(){
+        return 'testGetter';
+      });
+      obj.__defineSetter__('testSetter', function(value){
+        this.value = value;
+      });
+
+      var Cls = Class.define('cls').implement(obj, true);
+
+      expect(Cls.testGetter).to.equal('testGetter');
+
+      Cls.testSetter = 'stuff';
+      expect(Cls.value).to.equal('stuff');
+      expect(obj.value).to.be.an('undefined');
+
+      expect(Cls.read).to.be.a('function');
+
+    },
     OldSchoolNewOperator: function(){
       var NewCls, Cls = Class.define('Cls', {
         construct: function(test){
@@ -624,12 +648,12 @@ module.exports = {
       expect(Beagle.isBig).to.equal(false);
       expect(Beagle.color).to.equal('brown');
 
-      expect(Beagle.count).to.be.ok();
+      expect(Beagle.count).to.be(0);
 
-      expect(Beagle.$implements[0].$isClass(Bird)).not.to.be.ok();
-      expect(Beagle.$implements[0].$isClass(Animal)).not.to.be.ok();
-      expect(Beagle.$implements[0].$isClass(Dog)).to.be.ok();
-      expect(Beagle.$implements[1].$isClass(Color)).to.be.ok();
+      expect(Beagle.$implements[0].$isClass(Bird)).to.be(false);
+      expect(Beagle.$implements[0].$isClass(Animal)).to.be(false);
+      expect(Beagle.$implements[0].$isClass(Dog)).to.be(true);
+      expect(Beagle.$implements[1].$isClass(Color)).to.be(true);
 
     },
 
