@@ -182,8 +182,6 @@ module.exports = {
       expect(Cls.value).to.equal('stuff');
       expect(obj.value).to.be.an('undefined');
 
-      expect(Cls.read).to.be.a('function');
-
     },
     OldSchoolNewOperator: function(){
       var NewCls, Cls = Class.define('Cls', {
