@@ -1,5 +1,5 @@
 /**
- * @version 1.0.2
+ * @version 1.0.4
  */
 'use strict';
 
@@ -346,10 +346,7 @@ ES5Class.implement = function (obj, apply){
       for (var key in obj) {
         descriptor = gpd(obj, key);
         if (descriptor !== undefined && (descriptor.set || descriptor.get)){
-          Object.defineProperty(self, key, {
-            get: descriptor.get,
-            set: descriptor.set
-          });
+          Object.defineProperty(self, key, descriptor);
         } else if (obj[key] !== undefined) {
           if (key !== 'prototype' && key !== '__proto__') {
             if (obj[key]['$class'] !== undefined) {
@@ -388,7 +385,7 @@ ES5Class.implement = function (obj, apply){
  * Current version
  */
 Object.defineProperty(ES5Class, '$version', {
-  value: '1.0.3'
+  value: '1.0.4'
 });
 
 /**

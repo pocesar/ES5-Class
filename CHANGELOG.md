@@ -1,3 +1,6 @@
+## 1.0.4
+* Getters and setter should retain their properties (enumerable, configurable, etc)
+
 ## 1.0.3
 * Fix getter and setters by using getOwnPropertyDescriptor (__defineGetter__ and __defineSetter__)
 * Fix crash when trying to call an object as a parent constructor
