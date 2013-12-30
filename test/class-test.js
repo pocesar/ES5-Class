@@ -5,7 +5,7 @@ var
 
 module.exports = {
   before: function (){
-    Animal = Class.define(
+    Animal = Class.$define(
       'Animal',
       {
         construct: function (name){
@@ -36,7 +36,7 @@ module.exports = {
       }
     );
 
-    Bird = Animal.define(
+    Bird = Animal.$define(
       'Bird',
       {
         construct: function (name){
@@ -49,7 +49,7 @@ module.exports = {
       }
     );
 
-    Color = Class.define('Color', {
+    Color = Class.$define('Color', {
       setColor: function (name){
         this.color = name;
       }
@@ -57,7 +57,7 @@ module.exports = {
       color: 'brown'
     });
 
-    Dog = Animal.define('Dog', {
+    Dog = Animal.$define('Dog', {
       construct: function (name){
         this.name = name;
       }
@@ -67,22 +67,22 @@ module.exports = {
       }
     });
 
-    Dog.include({
+    Dog.$include({
       cry: function (){
         return 'wof!';
       }
     });
 
-    Dog.implement([
+    Dog.$implement([
       {
         isBig: true
       },
       Color
     ]);
 
-    Beagle = Animal.define('Beagle');
-    Beagle.implement([Dog, Color]);
-    Beagle.include({
+    Beagle = Animal.$define('Beagle');
+    Beagle.$implement([Dog, Color]);
+    Beagle.$include({
       construct: function (name){
         this.name = name;
         this.setColor('white and brown');
@@ -90,7 +90,7 @@ module.exports = {
     });
     Beagle.isBig = false;
 
-    Privat = Class.define('Private', function (){
+    Privat = Class.$define('Private', function (){
       var arr = [];
 
       return {
@@ -113,7 +113,7 @@ module.exports = {
       };
     });
 
-    Privat.include(function (){
+    Privat.$include(function (){
       var another_private = 'yes';
 
       return {
@@ -124,7 +124,7 @@ module.exports = {
       };
     });
 
-    Privat.implement(function (){
+    Privat.$implement(function (){
       var deal = -1;
 
       return {
@@ -134,16 +134,16 @@ module.exports = {
       };
     });
 
-    animal = Animal.create('An Animal');
-    bird = Bird.create('A Bird');
-    dog = Dog.create('A Dog');
-    beagle = Beagle.create('A Beagle');
+    animal = Animal.$create('An Animal');
+    bird = Bird.$create('A Bird');
+    dog = Dog.$create('A Dog');
+    beagle = Beagle.$create('A Beagle');
 
-    color = Color.create();
+    color = Color.$create();
     color.setColor('A color');
 
-    privat = Privat.create([1, 2, 3, 4]);
-    privat2 = Privat.create();
+    privat = Privat.$create([1, 2, 3, 4]);
+    privat2 = Privat.$create();
   },
 
   after: function (){
@@ -161,6 +161,56 @@ module.exports = {
   },
 
   ES5Class: {
+    ExchangeProto: function(done){
+      var EM = require('events').EventEmitter;
+
+      var baseCls = Class.$define('BaseCls', {
+        originalFunction: function(){},
+        originalValue: true
+      }, {
+        originalClassValue: true
+      }).$create();
+
+      baseCls.$exchange(EM);
+
+      expect(baseCls).to.not.have.property('originalFunction');
+      expect(baseCls).to.not.have.property('originalValue');
+
+      baseCls.on('test', function(value){
+        expect(value).to.be(1);
+        done();
+      });
+
+      baseCls.emit('test', 1);
+
+      expect(baseCls instanceof EM).to.be(true);
+
+      var Server = require('http').Server;
+
+      Class.prototype.$exchange.call(baseCls, Server, []);
+
+      expect(baseCls instanceof Server).to.be(true);
+    },
+    NewImportAfterInstantiated: function(){
+      var BaseCls = Class.$define('BaseCls', {
+        fromPrototype: function(){ this.$class.value = true; return false; }
+      }, {fromStaticToPrototype: function(){ return this.$class.value; }});
+
+      var NewCls = Class.$define('NewCls');
+
+      var newCls = NewCls.$create();
+      newCls.$import(BaseCls.prototype);
+
+      expect(newCls).to.have.property('fromPrototype');
+      expect(newCls).to.not.have.property('fromStaticToPrototype');
+
+      newCls.$import(BaseCls);
+
+      expect(newCls).to.have.property('fromStaticToPrototype');
+      expect(newCls.fromPrototype()).to.equal(false);
+      expect(newCls.fromStaticToPrototype()).to.equal(true);
+
+    },
     ImportGettersAndSetters: function(){
       var http = require('http');
       var obj = {
@@ -174,7 +224,7 @@ module.exports = {
         this.value = value;
       });
 
-      var Cls = Class.define('cls').implement(obj, true);
+      var Cls = Class.$define('cls').$implement(obj, true);
 
       expect(Cls.testGetter).to.equal('testGetter');
 
@@ -184,7 +234,7 @@ module.exports = {
 
     },
     OldSchoolNewOperator: function(){
-      var NewCls, Cls = Class.define('Cls', {
+      var NewCls, Cls = Class.$define('Cls', {
         construct: function(test){
           this.test = test;
         }
@@ -196,11 +246,11 @@ module.exports = {
 
       expect(cls.test).to.equal('new');
 
-      Cls.include(obj);
+      Cls.$include(obj);
 
       expect(cls.called('yes')).to.equal('new: yes');
 
-      NewCls = Cls.define('NewCls', {
+      NewCls = Cls.$define('NewCls', {
         called: function(){
           return this.$super('no');
         }
@@ -209,11 +259,11 @@ module.exports = {
       expect((new NewCls('yes')).called()).to.equal('yes: no');
 
       var
-        NewBuffer = Class.define('NewBuffer', {
+        NewBuffer = Class.$define('NewBuffer', {
           test: function(){
             return true;
           }
-        }).implement(Buffer, true),
+        }).$implement(Buffer, true),
         newbuffer;
 
       newbuffer = new NewBuffer(4);
@@ -226,7 +276,7 @@ module.exports = {
       expect(/.\..\../.test(Class.$version)).to.equal(true);
     },
     Enumerables: function(){
-      var Cls = Class.define('Cls', {
+      var Cls = Class.$define('Cls', {
         construct: function(name){
           this.name = name;
           this.loaded = false;
@@ -244,9 +294,9 @@ module.exports = {
       expect(Object.keys(new Cls('My Name'))).to.eql(['name','loaded']);
     },
     NextTick: function(done){
-      var MyEventClass = Class.define('MyEventEmitter', function(){
+      var MyEventClass = Class.$define('MyEventEmitter', function(){
           var base = this;
-          base.implement(require('events').EventEmitter, true);
+          base.$implement(require('events').EventEmitter, true);
 
           return {
               construct: function(){
@@ -259,7 +309,7 @@ module.exports = {
           };
       });
 
-      var instance = MyEventClass.create();
+      var instance = MyEventClass.$create();
 
       instance.on('created', function(base){
         expect(base).to.eql(MyEventClass);
@@ -270,9 +320,9 @@ module.exports = {
       expect(instance._events).to.be.an('object');
     },
     InheritBuffer: function(){
-      var MyBuffer = Class.define('MyBuffer').implement(Buffer, true);
+      var MyBuffer = Class.$define('MyBuffer').$implement(Buffer, true);
 
-      var buf = MyBuffer.create(4);
+      var buf = MyBuffer.$create(4);
 
       expect(MyBuffer.prototype.write).to.be.a('function');
       expect(buf.parent).to.be.an('object');
@@ -283,7 +333,7 @@ module.exports = {
     },
     DirectClassMixin: function(){
       var
-        Class1 = Class.define('Class1', {
+        Class1 = Class.$define('Class1', {
           isTrue: function(){
             return true;
           }
@@ -292,20 +342,20 @@ module.exports = {
             return false;
           }
         }),
-        Class2 = Class.define('Class2', Class1);
+        Class2 = Class.$define('Class2', Class1);
 
-      expect(Class2.create().isTrue).to.be.an('undefined');
+      expect(Class2.$create().isTrue).to.be.an('undefined');
       expect(Class2.isFalse).to.be.an('undefined');
-      expect(Class2.create().isFalse()).to.equal(false);
+      expect(Class2.$create().isFalse()).to.equal(false);
       expect(Class2.$implements).to.eql([]);
 
-      Class2.implement([Class1]);
+      Class2.$implement([Class1]);
       expect(Class2.isFalse()).to.equal(false);
-      expect(Class2.create().isTrue()).to.equal(true);
+      expect(Class2.$create().isTrue()).to.equal(true);
     },
     ArrayImplementInclude: function(){
       var Bases = [
-        Class.define('Base1', {
+        Class.$define('Base1', {
           one: function(){
             return true;
           }
@@ -315,14 +365,14 @@ module.exports = {
           },
           included: true
         }),
-        Class.define('Base2', {
+        Class.$define('Base2', {
           two: function(){
             return true;
           }
         }, {
           included: false
         }),
-        Class.define('Base3', {
+        Class.$define('Base3', {
           one: function(){
             return false;
           },
@@ -340,8 +390,8 @@ module.exports = {
         }
       ];
 
-      var Instance = Class.define('Instance', Bases);
-      var instance = Instance.create();
+      var Instance = Class.$define('Instance', Bases);
+      var instance = Instance.$create();
 
       expect(instance.yes).to.be.a('function');
       expect(instance.included).not.to.be.an('undefined');
@@ -352,7 +402,7 @@ module.exports = {
       expect(instance.four()).to.equal('four');
       expect(instance.included).to.equal(false);
 
-      Instance = Class.define('Instance', {}, Bases);
+      Instance = Class.$define('Instance', {}, Bases);
 
       expect(Instance.one).to.be.an('undefined');
       expect(Instance.two).to.be.an('undefined');
@@ -360,11 +410,11 @@ module.exports = {
       expect(Instance.yes).to.be.a('function');
       expect(Instance.four()).to.equal('four');
       expect(Instance.yes()).to.equal('yes');
-      expect(Instance.create().three()).to.equal(false);
+      expect(Instance.$create().three()).to.equal(false);
       expect(Instance.$implements).to.eql(Bases.slice(0, -1));
     },
     InstanceWithoutCreate: function(){
-      var S = Class.define('S', {
+      var S = Class.$define('S', {
         construct: function(lol){
           this.lol = lol;
         },
@@ -374,17 +424,17 @@ module.exports = {
       }), s = S('rofl');
 
       expect(s).to.be.an('object');
-      expect(S.create('lol').test()).to.equal('lol');
+      expect(S.$create('lol').test()).to.equal('lol');
       expect(S('lmao').test('!')).to.equal('lmao!');
     },
     ImplementEventEmitter: function(done){
-      var AlmostEmptyClass = Class.define('AlmostEmptyClass', {
+      var AlmostEmptyClass = Class.$define('AlmostEmptyClass', {
         lambda: true
       });
 
-      AlmostEmptyClass.implement(require('events').EventEmitter, true);
+      AlmostEmptyClass.$implement(require('events').EventEmitter, true);
 
-      var aec = AlmostEmptyClass.create();
+      var aec = AlmostEmptyClass.$create();
 
       expect(aec.lambda).to.equal(true);
       expect(aec.on).to.be.a('function');
@@ -399,39 +449,39 @@ module.exports = {
       aec.emit('true', true);
     },
     ArrayMixin: function(){
-      var Class1 = Class.define('Class1', {}, {done: true}),
-          Class2 = Class.define('Class2', {func: function(){ return true; }}),
-          Class3 = Class.define('Class3', {}, {yet: true});
+      var Class1 = Class.$define('Class1', {}, {done: true}),
+          Class2 = Class.$define('Class2', {func: function(){ return true; }}),
+          Class3 = Class.$define('Class3', {}, {yet: true});
 
-      var NewClass = Class.define('NewClass', {}, [Class1, Class2, Class3]);
+      var NewClass = Class.$define('NewClass', {}, [Class1, Class2, Class3]);
 
       Class1.done = false;
       expect(NewClass.done).to.equal(true);
       expect(NewClass.yet).to.equal(true);
       expect(NewClass.$parent).to.eql(Class);
       expect(NewClass.$implements).to.eql([Class1, Class2, Class3]);
-      expect(NewClass.create().func()).to.equal(true);
-      expect(NewClass.create().$class.done).to.equal(true);
+      expect(NewClass.$create().func()).to.equal(true);
+      expect(NewClass.$create().$class.done).to.equal(true);
 
-      expect(NewClass.create().func()).to.equal(true);
+      expect(NewClass.$create().func()).to.equal(true);
 
       NewClass.done = false;
 
-      var NewClass2 = Class2.define('NewClass2', {}, [Class1, Class3]);
+      var NewClass2 = Class2.$define('NewClass2', {}, [Class1, Class3]);
 
-      expect(NewClass2.create().func()).to.equal(true);
+      expect(NewClass2.$create().func()).to.equal(true);
 
-      Class2.include({
+      Class2.$include({
         func: function(){
           return false;
         }
       });
 
-      expect(NewClass2.create().func()).to.equal(false);
+      expect(NewClass2.$create().func()).to.equal(false);
       expect(NewClass2.done).to.equal(false);
     },
     ClassAccesses: function(){
-      var h = Class.define('Class', function(){
+      var h = Class.$define('Class', function(){
         return {
           done: function(){
             expect(this.$class.property).to.equal(true);
@@ -452,7 +502,7 @@ module.exports = {
 
       expect(h).to.eql(h.$class);
 
-      h.create().done();
+      h.$create().done();
       expect(h.property).to.equal(false);
 
       h.property = true;
@@ -462,7 +512,7 @@ module.exports = {
     },
     DuckTyping: function (){
 
-      var Op = Class.define('Op', {
+      var Op = Class.$define('Op', {
         construct: function (number){
           this.number = number;
         },
@@ -471,25 +521,25 @@ module.exports = {
         }
       });
 
-      var Mul = Op.define('Multiply', {
+      var Mul = Op.$define('Multiply', {
         operator: function (number){
           return (number) * (this.number);
         }
       });
 
-      var Div = Op.define('Divide', {
+      var Div = Op.$define('Divide', {
         operator: function (number){
           return (number) / (this.number);
         }
       });
 
-      var Sum = Op.define('Sum', {
+      var Sum = Op.$define('Sum', {
         operator: function (number){
           return (number) + (this.number);
         }
       });
 
-      var Operation = Class.define('Operation', {}, function (){
+      var Operation = Class.$define('Operation', {}, function (){
         var
           classes = [],
           number = 0;
@@ -522,18 +572,18 @@ module.exports = {
         };
       });
 
-      var sum = Sum.create(40);
-      var mul = Mul.create(50);
-      var div = Div.create(20);
+      var sum = Sum.$create(40);
+      var mul = Mul.$create(50);
+      var div = Div.$create(20);
       Operation.number(100);
       expect(Operation.add([sum, mul, div]).result()).to.equal(350);
-      var mul2 = Mul.create(30);
+      var mul2 = Mul.$create(30);
       expect(Operation.onthefly([div, sum, mul, mul2])).to.equal(67500);
     },
 
     Singleton: function (){
 
-      var Test = Class.define('Test', {}, {
+      var Test = Class.$define('Test', {}, {
         test: function (){
           return 'Test::';
         }
@@ -541,7 +591,7 @@ module.exports = {
 
       expect(Test.test()).to.equal('Test::');
 
-      Test.implement({
+      Test.$implement({
         test: function (){
           return 'New::' + this.$super();
         }
@@ -549,7 +599,7 @@ module.exports = {
 
       expect(Test.test()).to.equal('New::Test::');
 
-      Test.implement({
+      Test.$implement({
         test: function (){
           return 'And::' + this.$super();
         }
@@ -557,11 +607,11 @@ module.exports = {
 
       expect(Test.test()).to.equal('And::New::Test::');
 
-      var NewTest = Test.define('NewTest');
+      var NewTest = Test.$define('NewTest');
 
       expect(NewTest.test()).to.equal('And::New::Test::');
 
-      NewTest.implement({
+      NewTest.$implement({
         test: function (){
           return 'NewTest::' + this.$super();
         }
@@ -574,7 +624,7 @@ module.exports = {
 
     Overload: function (){
 
-      var ES5Person = Class.define('ES5Person', {
+      var ES5Person = Class.$define('ES5Person', {
         construct : function (name){
           this.name = name;
         },
@@ -585,19 +635,19 @@ module.exports = {
         }
       });
 
-      var ES5FrenchGuy = ES5Person.define('ES5FrenchGuy', {
+      var ES5FrenchGuy = ES5Person.$define('ES5FrenchGuy', {
         setAddress: function (city, street){
           this.$super('France', city, street);
         }
       });
 
-      var ES5ParisLover = ES5FrenchGuy.define('ES5ParisLover', {
+      var ES5ParisLover = ES5FrenchGuy.$define('ES5ParisLover', {
         setAddress: function (street){
           this.$super('Paris', street);
         }
       });
 
-      var p40 = ES5ParisLover.create('Mary');
+      var p40 = ES5ParisLover.$create('Mary');
 
       expect(p40.setAddress).to.be.a('function');
 
@@ -612,11 +662,11 @@ module.exports = {
 
     ClassDefine: function (){
       expect(function (){
-        Class.define();
+        Class.$define();
       }).to.throwException();
 
-      expect(Class.define('SubClass')).to.be.ok();
-      expect(Class.define('SubClass', {}, {})).to.be.ok();
+      expect(Class.$define('SubClass')).to.be.ok();
+      expect(Class.$define('SubClass', {}, {})).to.be.ok();
     },
 
     Classes: function (){
@@ -735,7 +785,7 @@ module.exports = {
     },
 
     ExtendingBase: function(){
-      var Base = Class.define('Base', {
+      var Base = Class.$define('Base', {
         done: function(){
           this.$class.count++;
         }
@@ -743,15 +793,15 @@ module.exports = {
         count: 1
       });
 
-      var Next = Base.define('Next', {}, {
+      var Next = Base.$define('Next', {}, {
         count: 0
       });
 
       expect(Base.count).to.equal(1);
       expect(Next.count).to.equal(0);
 
-      var base = Base.create();
-      var next = Next.create();
+      var base = Base.$create();
+      var next = Next.$create();
 
       base.done();
       next.done();
@@ -759,14 +809,14 @@ module.exports = {
       expect(Base.count).to.equal(2);
       expect(Next.count).to.equal(1);
 
-      Base.include({
+      Base.$include({
         included: function(){
           this.$class.count++;
           return true;
         }
       });
 
-      Base.implement({
+      Base.$implement({
         implemented: function(){
           this.count++;
           return true;
@@ -789,7 +839,7 @@ module.exports = {
       expect(Base.count).to.equal(3);
       Next.parented();
 
-      Next.implement({
+      Next.$implement({
         implemented: function(item){
           return typeof item !== 'undefined' ? item : void 0;
         },
@@ -809,7 +859,7 @@ module.exports = {
     },
 
     ClosureParentMethod: function(){
-      var Clss = Class.define('Clss', {}, function(){
+      var Clss = Class.$define('Clss', {}, function(){
         return {
           factory: function(oval){
             this.oval = oval;
@@ -818,7 +868,7 @@ module.exports = {
         };
       });
 
-      var Clsss = Clss.define('Clsss', {}, function($super){
+      var Clsss = Clss.$define('Clsss', {}, function($super){
         expect(this.factory).to.be.ok();
         expect(this.factory).to.eql($super.factory);
 
@@ -833,7 +883,7 @@ module.exports = {
 
       expect(Clsss.factory(true).oval).to.be(true);
 
-      var Cls = Clsss.define('Cls', {}, {
+      var Cls = Clsss.$define('Cls', {}, {
         factory: function(){
           this.$super(false);
           return this;
@@ -845,7 +895,7 @@ module.exports = {
 
     ClosureParentInstance: function(){
 
-      var Clss = Class.define('Clss', function(){
+      var Clss = Class.$define('Clss', function(){
         return {
           construct: function(oval){
             this.oval = oval;
@@ -853,7 +903,7 @@ module.exports = {
         };
       });
 
-      var Clsss = Clss.define('Clsss', function($super){
+      var Clsss = Clss.$define('Clsss', function($super){
         expect(this.prototype.construct).to.be.ok();
         expect(this.prototype.construct).to.eql($super.construct);
 
@@ -865,15 +915,15 @@ module.exports = {
         };
       });
 
-      expect(Clsss.create(true).oval).to.be(true);
+      expect(Clsss.$create(true).oval).to.be(true);
     },
 
     Closures: function(){
-      var Count = Class.define('Count', {}, {
+      var Count = Class.$define('Count', {}, {
         count: 0
       });
 
-      var Share = Count.define('Share', function (){
+      var Share = Count.$define('Share', function (){
         var _data = {}, self = this;
 
         return {
@@ -892,7 +942,7 @@ module.exports = {
         };
       }, {count: 2});
 
-      var one = Share.create('one'), two = Share.create('two');
+      var one = Share.$create('one'), two = Share.$create('two');
       one.append('dub', true); // _data is now {'dub': true}
       two.append('dub', false); // _data is now {'dub': false}
       two.append('bleh', [1, 2, 3]); // _data is now {'dub': false, 'bleh': [1,2,3]}

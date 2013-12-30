@@ -17,10 +17,10 @@ suite
   .add('class instance function call',
     util._extend({
         fn   : function (){
-          Cls.create().test();
+          Cls.$create().test();
         },
         setup: function (){
-          var Cls = this.args.Class.define('cls', {
+          var Cls = this.args.Class.$define('cls', {
             'test': function (){
               return true;
             }
@@ -33,8 +33,8 @@ suite
   .add('class method function call',
     util._extend({
         setup: function (){
-          var Cls = this.args.Class.define('cls');
-          Cls.implement({
+          var Cls = this.args.Class.$define('cls');
+          Cls.$implement({
             'test': function (){
               return true;
             }
@@ -50,15 +50,15 @@ suite
   .add('class instance included function call',
     util._extend({
         setup: function (){
-          var Cls = this.args.Class.define('cls');
-          Cls.include({
+          var Cls = this.args.Class.$define('cls');
+          Cls.$include({
             'test': function (){
               return true;
             }
           });
         },
         fn   : function (){
-          Cls.create().test();
+          Cls.$create().test();
         }
       },
       base
@@ -67,20 +67,20 @@ suite
   .add('$super instance function calls',
     util._extend({
         setup: function (){
-          var Cls = this.args.Class.define('cls', {
+          var Cls = this.args.Class.$define('cls', {
             test: function (){
               return true;
             }
           });
-          var Clss = Cls.define('clss', {
+          var Clss = Cls.$define('clss', {
             test: function (){
               return this.$super();
             }
           });
         },
         fn   : function (){
-          var create = Clss.create();
-          create.test();
+          var $create = Clss.$create();
+          $create.test();
         }
       },
       base
@@ -89,13 +89,13 @@ suite
   .add('$super class function calls',
     util._extend({
         setup: function (){
-          var Cls = this.args.Class.define('cls', {}, {
+          var Cls = this.args.Class.$define('cls', {}, {
             test: function (){
               return true;
             }
           });
 
-          Cls.implement({
+          Cls.$implement({
             test: function (){
               return this.$super();
             }
@@ -111,17 +111,17 @@ suite
   .add('$super inherited two levels deep function calls',
     util._extend({
         setup: function (){
-          var Cls = this.args.Class.define('cls', {}, {
+          var Cls = this.args.Class.$define('cls', {}, {
             test: function (){
               return true;
             }
           });
-          Cls.implement({
+          Cls.$implement({
             test: function (){
               return this.$super();
             }
           });
-          var Two = Cls.define('Two', {}, {
+          var Two = Cls.$define('Two', {}, {
             test: function (){
               return this.$super();
             }
@@ -137,14 +137,14 @@ suite
   .add('class instantiation',
     util._extend({
         setup: function (){
-          var Cls = this.args.Class.define('cls', {
+          var Cls = this.args.Class.$define('cls', {
             vibrate: function (){
               return true;
             }
           });
         },
         fn   : function (){
-          var cls = Cls.create();
+          var cls = Cls.$create();
           cls.vibrate();
         }
       },
@@ -154,7 +154,7 @@ suite
   .add('new instantiation',
     util._extend({
         setup: function (){
-          var Cls = this.args.Class.define('Cls', {
+          var Cls = this.args.Class.$define('Cls', {
             construct: function(ret) {
               this.ret = ret;
             },
@@ -172,7 +172,7 @@ suite
   .add('Auto instantiation',
     util._extend({
         setup: function (){
-          var Cls = this.args.Class.define('Cls', {
+          var Cls = this.args.Class.$define('Cls', {
             construct: function(ret) {
               this.ret = ret;
             },

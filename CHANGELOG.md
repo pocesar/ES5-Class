@@ -1,5 +1,9 @@
-## 1.0.4
+## 1.1.0
 * Getters and setter should retain their properties (enumerable, configurable, etc)
+* Added $import, you can mixin to the class after it been instantiated
+* Made "non dollar" functions deprecated (and they can be overriden, the $ functions can't, that is, $define, $implement, $include, $create). The reason is to avoid collisions when extending other classes that you do not own
+* Implemented $exchange, you can change the current instance __proto__ to something else on-the-fly
+* Named functions to be easier to spot bugs on stack
 
 ## 1.0.3
 * Fix getter and setters by using getOwnPropertyDescriptor (__defineGetter__ and __defineSetter__)
