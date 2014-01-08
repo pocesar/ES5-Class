@@ -1,3 +1,8 @@
+## 1.1.1
+* Declarations on prototype should be deletable by default. If you must, use Object.defineProperty inside your construct
+* Implemented $destroy to ensure there are NO traces of references in the instance
+* Minor performance improvements
+
 ## 1.1.0
 * Getters and setter should retain their properties (enumerable, configurable, etc)
 * Added $import, you can mixin to the class after it been instantiated

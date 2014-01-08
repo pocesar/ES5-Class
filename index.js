@@ -1,5 +1,5 @@
 /**
- * @version 1.1.0
+ * @version 1.1.1
  */
 'use strict';
 
@@ -24,7 +24,7 @@ var
   },
   superApply = function superApply(instance, object, args){
     if (object.$apply.length) {
-      object.$apply.forEach(function (f){
+      object.$apply.forEach(function eachApply(f){
         if (f.apply) {
           // dirty little hack to make classes like Buffer think the prototype is instanceof itself
           spo(instance, f.prototype);
@@ -34,20 +34,22 @@ var
     }
   },
   splat = function splat(obj, context, args){
+    obj.$arguments = args;
+
     if (args.length > 0) {
       switch (args.length) {
         case 1:
-          return obj[context](args[0]);
+          return obj[context](obj.$arguments[0]);
         case 2:
-          return obj[context](args[0], args[1]);
+          return obj[context](obj.$arguments[0], obj.$arguments[1]);
         case 3:
-          return obj[context](args[0], args[1], args[2]);
+          return obj[context](obj.$arguments[0], obj.$arguments[1], obj.$arguments[2]);
         case 4:
-          return obj[context](args[0], args[1], args[2], args[3]);
+          return obj[context](obj.$arguments[0], obj.$arguments[1], obj.$arguments[2], obj.$arguments[3]);
         case 5:
-          return obj[context](args[0], args[1], args[2], args[3], args[4]);
+          return obj[context](obj.$arguments[0], obj.$arguments[1], obj.$arguments[2], obj.$arguments[3], obj.$arguments[4]);
         default:
-          return obj[context].apply(context, args);
+          return obj[context].apply(context, obj.$arguments);
       }
     } else {
       return obj[context]();
@@ -70,7 +72,7 @@ var
     if (!hasSuperRegex.test(obj[key])) {
       return obj[key];
     }
-    return function (){
+    return function wrapped(){
       var originalSuper, ret, self = this;
 
       originalSuper = self.$super; // store current $super
@@ -267,8 +269,6 @@ Object.defineProperty(ES5Class, '$create', {
 
     spo(instance, self.prototype); // always need to restore prototype after superApply
 
-    instance.$arguments = arguments;
-
     if (instance.construct && instance.construct !== noop) {
       splat(instance, 'construct', arguments);
     }
@@ -427,7 +427,7 @@ ES5Class.implement = ES5Class.$implement;
  * Current version
  */
 Object.defineProperty(ES5Class, '$version', {
-  value: '1.1.0'
+  value: '1.1.1'
 });
 
 /**
@@ -455,6 +455,20 @@ Object.defineProperty(ES5Class.prototype, '$class', {
   get: function $class(){
     return ES5Class;
   }
+});
+
+/**
+ * Cleanup any variables that might hold external objects on the class before getting rid of it
+ */
+Object.defineProperty(ES5Class.prototype, '$destroy', {
+  value: function $destroy(){
+    var self = this, k;
+    self.$arguments = null;
+    for (k in self) {
+      self[k] = null;
+    }
+  },
+  configurable: true
 });
 /**
  * Exchanges current proto for something else.

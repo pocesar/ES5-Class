@@ -161,6 +161,76 @@ module.exports = {
   },
 
   ES5Class: {
+    Destroy: function(){
+      var
+        anotherOtherObj = [],
+        anotherObj = {
+          yes: true
+        },
+        Base = Class.$define('Base', {
+          fromBase: anotherOtherObj
+        }),
+        Klass = Base.$define('Klass', {
+          construct: function (){
+            this.anotherObject = anotherObj;
+          },
+          defineObj: function (doh){
+            this.defined = doh;
+          }
+        }, {
+          obj: anotherObj
+        }),
+        klass = new Klass(anotherObj);
+
+      klass.defineObj(anotherOtherObj);
+
+      expect(klass.$arguments).to.eql([anotherObj]);
+      expect(klass.anotherObject).to.be(anotherObj);
+      expect(klass.$class.obj).to.be(anotherObj);
+      expect(klass.fromBase).to.be(anotherOtherObj);
+
+      klass.$destroy();
+
+      expect(anotherObj).to.eql({yes: true});
+      expect(anotherOtherObj).to.eql([]);
+      expect(klass.$arguments).to.be(null);
+      expect(klass.defined).to.be(null);
+      expect(klass.anotherObject).to.be(null);
+      expect(klass.fromBase).to.be(null);
+    },
+    CanDeleteDeclaratedValuesFromPrototype: function(){
+      var Test = Class.$define('Test', {
+        construct: function(){
+          this.inner = true;
+        },
+        declarated: {
+          member: true
+        },
+        deleteIt: function(){
+          delete this.declarated;
+        }
+      });
+      var test = new Test();
+
+      expect(test.declarated.member).to.equal(true);
+      expect(test.inner).to.equal(true);
+
+      test.deleteIt();
+      delete test.inner;
+
+      expect(test.inner).to.be.an('undefined');
+      expect(test.declarated.member).to.equal(true);
+
+      delete Test.prototype.declarated;
+
+      expect(test.declarated).to.be.an('undefined');
+      delete test.$arguments;
+
+      var newtest = new Test();
+
+      expect(newtest.declarated).to.be.an('undefined');
+      expect(test.$arguments).to.be.an('undefined');
+    },
     ExchangeProto: function(done){
       var EM = require('events').EventEmitter;
 
@@ -291,7 +361,7 @@ module.exports = {
       });
 
       expect(Object.keys(Cls)).to.eql(['isFalse']);
-      expect(Object.keys(new Cls('My Name'))).to.eql(['name','loaded']);
+      expect(Object.keys(new Cls('My Name'))).to.eql(['$arguments', 'name','loaded']);
     },
     NextTick: function(done){
       var MyEventClass = Class.$define('MyEventEmitter', function(){
