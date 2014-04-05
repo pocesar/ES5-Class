@@ -1,8 +1,8 @@
 {
   "name": "es5class",
-  "version": "1.1.1",
-  "description": "Prototypal inheritance based on ES5 Object.create and Object.defineProperty for node.js only",
-  "keywords" : [
+  "version": "1.1.2",
+  "description": "Prototypal inheritance based on ES5 Object.create and Object.defineProperty for node.js and modern browsers",
+  "keywords": [
     "es5",
     "class",
     "inheritance",
@@ -27,13 +27,17 @@
   },
   "dependencies": {},
   "devDependencies": {
-    "jshint": "*",
-    "mocha": "*",
+    "benchmark": "~1.0.0",
     "expect.js": "*",
-    "benchmark": "~1.0.0"
+    "istanbul": "^0.2.7",
+    "coveralls":"*",
+    "jshint": "*",
+    "mocha": "*"
   },
   "scripts": {
-    "test": "jshint index.js test/class-test.js && mocha test/class-test.js",
-    "benchmark": "node test/benchmark.js"
+    "test": "jshint index.js test/class-test.js && mocha",
+    "benchmark": "node test/benchmark.js",
+    "coverage": "node ./node_modules/istanbul/lib/cli cover ./node_modules/mocha/bin/_mocha",
+    "coveralls": "node ./node_modules/istanbul/lib/cli.js cover ./node_modules/mocha/bin/_mocha -- --report lcovonly && cat ./coverage/lcov.info | node ./node_modules/coveralls/bin/coveralls.js"
   }
 }
