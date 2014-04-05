@@ -1,6 +1,6 @@
 {
   "name": "es5class",
-  "version": "1.1.2",
+  "version": "1.1.3",
   "description": "Prototypal inheritance based on ES5 Object.create and Object.defineProperty for node.js and modern browsers",
   "keywords": [
     "es5",
@@ -29,7 +29,7 @@
   "devDependencies": {
     "benchmark": "~1.0.0",
     "expect.js": "*",
-    "istanbul": "^0.2.7",
+    "istanbul": "0.2.x",
     "coveralls":"*",
     "jshint": "*",
     "mocha": "*"

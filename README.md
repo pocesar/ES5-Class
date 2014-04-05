@@ -6,7 +6,7 @@
 # ES5-Class
 -----------
 
-A Class object that enables native prototypal inheritance for Node and modern browsers. 
+A Class object that enables native prototypal inheritance for Node and modern browsers.
 
 Why should we write code like if we were in 2010? Read on!
 

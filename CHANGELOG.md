@@ -1,4 +1,4 @@
-## 1.1.2
+## 1.1.3
 * Fix test for new expect version
 * Added coverage badge
 
