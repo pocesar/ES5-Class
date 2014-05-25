@@ -1,0 +1,62 @@
+{
+  "name": "es5class",
+  "version": "2.0.0",
+  "description": "Prototypal inheritance based on ES5 Object.create and Object.defineProperty for node.js and modern browsers",
+  "keywords": [
+    "es5",
+    "class",
+    "inheritance",
+    "super",
+    "parent",
+    "singleton",
+    "method",
+    "prototypal",
+    "object.create",
+    "object.defineProperty",
+    "prototype",
+    "__proto__",
+    "setPrototypeOf",
+    "Object.setPrototypeOf"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pocesar/ES5-Class.git"
+  },
+  "engines": {
+    "node": ">=0.8.x"
+  },
+  "dependencies": {
+    "better-curry": "1.x.x"
+  },
+  "devDependencies": {
+    "benchmark": "1.x.x",
+    "expect.js": "*",
+    "istanbul": "0.2.x",
+    "coveralls": "*",
+    "jshint": "*",
+    "mocha": "*",
+    "jsdoc": "*",
+    "ink-docstrap": "*"
+  },
+  "testling": {
+    "harness": "mocha-exports",
+    "files": "test/class-test.js",
+    "browsers": [
+      "ie/8..latest",
+      "chrome/latest",
+      "firefox/3.5",
+      "firefox/latest",
+      "safari/5..latest",
+      "iphone/6",
+      "ipad/6",
+      "android-browser/latest"
+    ]
+  },
+  "scripts": {
+    "test": "jshint index.js test/class-test.js && mocha",
+    "doc": "jsdoc index.js README.md -c ./jsdoc.conf.json",
+    "benchmark": "node test/benchmark.js",
+    "coverage": "node ./node_modules/istanbul/lib/cli.js cover ./node_modules/mocha/bin/_mocha",
+    "coveralls": "node ./node_modules/istanbul/lib/cli.js cover ./node_modules/mocha/bin/_mocha -- --report lcovonly && cat ./coverage/lcov.info | node ./node_modules/coveralls/bin/coveralls.js"
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "tags"     : {
+    "allowUnknownTags": true
+  },
+  "plugins"  : ["plugins/markdown"],
+  "opts"     : {
+    "recurse"    : false,
+    "private"    : true,
+    "destination": "./doc",
+    "template"   : "./node_modules/ink-docstrap/template"
+  },
+  "templates": {
+    "cleverLinks"      : false,
+    "monospaceLinks"   : false,
+    "dateFormat"       : "DD / MM / YYYY",
+    "outputSourceFiles": false,
+    "outputSourcePath" : false,
+    "systemName"       : "ES5Class",
+    "footer"           : "",
+    "copyright"        : "",
+    "navType"          : "inline",
+    "theme"            : "united",
+    "linenums"         : false,
+    "collapseSymbols"  : true,
+    "inverseNav"       : false
+  },
+  "markdown" : {
+    "parser"  : "gfm",
+    "hardwrap": true
+  }
+}
