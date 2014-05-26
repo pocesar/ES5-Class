@@ -28,6 +28,7 @@
   "dependencies": {
     "better-curry": "1.x.x"
   },
+  "homepage":"http://pocesar.github.io/ES5-Class",
   "devDependencies": {
     "benchmark": "1.x.x",
     "expect.js": "*",

@@ -9,7 +9,7 @@
 * Fix `$instanceOf`
 * Changes in JSDOC
 * Implement `$names` (shortcut for `Object.getOwnPropertyNames(this)`)
-* Added `$inherits` for importing another class completely, but with separated arguments
+* Added `$inherit` for importing another class completely, but with separated arguments
 * Class `$implements` must be unique
 * Fix `constructor` member of class
 * Removed deprecated code (`create`, `implement`, `define`, `include`)
