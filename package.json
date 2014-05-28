@@ -1,6 +1,6 @@
 {
   "name": "es5class",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Prototypal inheritance based on ES5 Object.create and Object.defineProperty for node.js and modern browsers",
   "keywords": [
     "es5",
@@ -23,7 +23,7 @@
     "url": "https://github.com/pocesar/ES5-Class.git"
   },
   "engines": {
-    "node": ">=0.8.x"
+    "node": ">=0.10.x"
   },
   "dependencies": {
     "better-curry": "1.x.x"
@@ -47,10 +47,11 @@
       "chrome/latest",
       "firefox/3.5",
       "firefox/latest",
-      "safari/5..latest",
-      "iphone/6",
-      "ipad/6",
-      "android-browser/latest"
+      "safari/5.1",
+      "safari/6.0",
+      "iphone/6.0",
+      "ipad/6.0",
+      "android-browser/4.2"
     ]
   },
   "scripts": {

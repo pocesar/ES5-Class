@@ -1,3 +1,7 @@
+## 2.0.1
+* Fix tests for Travis and Testling
+* Drop Node.js 0.8 support
+
 ## 2.0.0
 * Bump version for major API changes and isn't backwards compatible
 * Rewrite some tests
