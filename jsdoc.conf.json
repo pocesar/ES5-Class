@@ -2,7 +2,10 @@
   "tags"     : {
     "allowUnknownTags": true
   },
-  "plugins"  : ["plugins/markdown"],
+  "plugins"  : [
+    "plugins/markdown",
+    "plugins/overloadHelper"
+  ],
   "opts"     : {
     "recurse"    : false,
     "private"    : true,
@@ -22,7 +25,11 @@
     "theme"            : "united",
     "linenums"         : false,
     "collapseSymbols"  : true,
-    "inverseNav"       : false
+    "inverseNav"       : false,
+    "analytics"        : {
+      "ua": "UA-10569443-28",
+      "domain": "pocesar.github.io"
+    }
   },
   "markdown" : {
     "parser"  : "gfm",
