@@ -43,10 +43,7 @@
     "harness": "mocha-bdd",
     "files": ["test/globals.js","test/class-test.js"],
     "browsers": [
-      "ie/8",
-      "ie/9",
-      "ie/10",
-      "ie/latest",
+      "ie/8..latest",
       "chrome/latest",
       "firefox/3.5",
       "firefox/latest",
@@ -58,7 +55,8 @@
     ]
   },
   "scripts": {
-    "test": "jshint index.js test/class-test.js && mocha",
+    "lint": "jshint index.js test/class-test.js",
+    "test": "mocha",
     "doc": "jsdoc index.js README.md -c ./jsdoc.conf.json",
     "benchmark": "node test/benchmark.js",
     "coverage": "node ./node_modules/istanbul/lib/cli.js cover ./node_modules/mocha/bin/_mocha",

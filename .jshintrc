@@ -19,7 +19,8 @@
     "expect":true,
     "before":true,
     "after":true,
-    "ES5Class":true
+    "ES5Class":true,
+    "BetterCurry":true
   },
   "proto"   : true,
   "sub"     : true

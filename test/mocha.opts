@@ -1,6 +1,4 @@
 --reporter spec
 --require test/globals.js
 --ui bdd
---check-leaks
---debug-brk
 test/class-test.js
