@@ -604,10 +604,66 @@ to ES5Class if not derived from any other class.</p>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">var YourClass = ES5Class.$define(&#x27;YourClass&#x27;);
-YourClass.$create(1,2,{&#x27;3&#x27;: 4}).$arguments &#x2F;&#x2F; [1,2,{&#x27;3&#x27;:4}]</pre>
+    <pre class="sunlight-highlight-javascript">var YourClass = ES5Class.$define(&#x27;YourClass&#x27;);YourClass.$create(1,2,{&#x27;3&#x27;: 4}).$arguments &#x2F;&#x2F; [1,2,{&#x27;3&#x27;:4}]</pre>
 
 
+    
+</dd>
+
+        
+            
+<dt>
+    <h4 class="name" id="$class"><span class="type-signature"></span>$class<span class="type-signature"> :<a href="ES5Class.html">ES5Class</a></span></h4>
+    
+    
+</dt>
+<dd>
+    
+    
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
+<span class="param-type"><a href="ES5Class.html">ES5Class</a></span>
+
+
+            </li>
+        </ul>
+    
+
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
     
 </dd>
 
@@ -736,7 +792,7 @@ YourClass.$create(1,2,{&#x27;3&#x27;: 4}).$arguments &#x2F;&#x2F; [1,2,{&#x27;3&
         
             
 <dt>
-    <h4 class="name" id="$class"><span class="type-signature"></span>$class<span class="type-signature"> :<a href="ES5Class.html">ES5Class</a></span></h4>
+    <h4 class="name" id="$className"><span class="type-signature"></span>$className<span class="type-signature"> :String</span></h4>
     
     
 </dt>
@@ -748,7 +804,7 @@ YourClass.$create(1,2,{&#x27;3&#x27;: 4}).$arguments &#x2F;&#x2F; [1,2,{&#x27;3&
         <ul>
             <li>
                 
-<span class="param-type"><a href="ES5Class.html">ES5Class</a></span>
+<span class="param-type">String</span>
 
 
             </li>
@@ -781,6 +837,13 @@ YourClass.$create(1,2,{&#x27;3&#x27;: 4}).$arguments &#x2F;&#x2F; [1,2,{&#x27;3&
 
 	
 
+	
+	<dt class="tag-see">See:</dt>
+	<dd class="tag-see">
+		<ul>
+			<li><a href="ES5Class.html#$className">ES5Class.$className</a></li>
+			</ul>
+	</dd>
 	
 
 	
@@ -915,8 +978,7 @@ YourClass.$create(1,2,{&#x27;3&#x27;: 4}).$arguments &#x2F;&#x2F; [1,2,{&#x27;3&
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">var YourClass = ES5Class.$define(&#x27;YourClass&#x27;,{ protoName: true });
-YourClass.$create().$names; &#x2F;&#x2F; [&#x27;protoName&#x27;]</pre>
+    <pre class="sunlight-highlight-javascript">var YourClass = ES5Class.$define(&#x27;YourClass&#x27;,{ protoName: true });YourClass.$create().$names; &#x2F;&#x2F; [&#x27;protoName&#x27;]</pre>
 
 
     
@@ -1141,8 +1203,7 @@ YourClass.$create().$names; &#x2F;&#x2F; [&#x27;protoName&#x27;]</pre>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">var YourDefinedClass = ES5Class.$define(&#x27;YourDefinedClass&#x27;);
-YourDefinedClass.$create(&#x27;some&#x27;, &#x27;arguments&#x27;);</pre>
+    <pre class="sunlight-highlight-javascript">var YourDefinedClass = ES5Class.$define(&#x27;YourDefinedClass&#x27;);YourDefinedClass.$create(&#x27;some&#x27;, &#x27;arguments&#x27;);</pre>
 
 
     
@@ -1380,21 +1441,7 @@ YourDefinedClass.$create(&#x27;some&#x27;, &#x27;arguments&#x27;);</pre>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">var NewClass = ES5Class.$define(&#x27;name&#x27;, {
-  construct: function(){
-  }
-}, {
-  static: 1
-});
-&#x2F;&#x2F; If you use a function, you need to return an object
-var NewClass = ES5Class.$define(&#x27;name&#x27;, function(){
- &#x2F;&#x2F; private variables
-
- return {
-   construct: function(){
-   }
- };
-});</pre>
+    <pre class="sunlight-highlight-javascript">var NewClass = ES5Class.$define(&#x27;name&#x27;, {  construct: function(){  }}, {  static: 1});&#x2F;&#x2F; If you use a function, you need to return an objectvar NewClass = ES5Class.$define(&#x27;name&#x27;, function(){ &#x2F;&#x2F; private variables return {   construct: function(){   } };});</pre>
 
 
     
@@ -1913,8 +1960,7 @@ super constructor will be called with no arguments.</p></td>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">var MyEventEmitter = ES5Class.$define(&#x27;MyEventEmitter&#x27;);
-MyEventEmitter.$inherit(require(&#x27;events&#x27;).EventEmitter, []);</pre>
+    <pre class="sunlight-highlight-javascript">var MyEventEmitter = ES5Class.$define(&#x27;MyEventEmitter&#x27;);MyEventEmitter.$inherit(require(&#x27;events&#x27;).EventEmitter, []);</pre>
 
 
     
@@ -2486,29 +2532,7 @@ performance.</p>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">&#x2F;&#x2F; by default, you create a delegate from the static members of the class
-var YourClass = ES5Class.$define(&#x27;YourClass&#x27;, {}, {
-  someFunction: function(){
-  },
-  someStaticObject: {}
-});
-var instance = YourClass.$create();
-instance.$delegate().access(&#x27;someStaticObject&#x27;).method(&#x27;someFunction&#x27;);
-
-instance.someFunction(); &#x2F;&#x2F; calls the YourClass.someFunction like if it belong to the prototype
-
-&#x2F;&#x2F; but you can create it from another member of the current instance
-YourClass.$include({
-  someData: {
-   subdata: {
-     &#x2F;&#x2F;...
-   }
-  }
-});
-instance = YourClass.$create();
-instance.$delegate(&#x27;someData&#x27;).access(&#x27;subdata&#x27;);
-instance.subdata.addMember = true; &#x2F;&#x2F; instance.someData.subdata.addMember === true
-&#x2F;&#x2F;instance.subdata is now a read&#x2F;write access to the original someData.subdata</pre>
+    <pre class="sunlight-highlight-javascript">&#x2F;&#x2F; by default, you create a delegate from the static members of the classvar YourClass = ES5Class.$define(&#x27;YourClass&#x27;, {}, {  someFunction: function(){  },  someStaticObject: {}});var instance = YourClass.$create();instance.$delegate().access(&#x27;someStaticObject&#x27;).method(&#x27;someFunction&#x27;);instance.someFunction(); &#x2F;&#x2F; calls the YourClass.someFunction like if it belong to the prototype&#x2F;&#x2F; but you can create it from another member of the current instanceYourClass.$include({  someData: {   subdata: {     &#x2F;&#x2F;...   }  }});instance = YourClass.$create();instance.$delegate(&#x27;someData&#x27;).access(&#x27;subdata&#x27;);instance.subdata.addMember = true; &#x2F;&#x2F; instance.someData.subdata.addMember === true&#x2F;&#x2F;instance.subdata is now a read&#x2F;write access to the original someData.subdata</pre>
 
 
     
@@ -2771,10 +2795,7 @@ of the application.</p>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">var MyClass = ES5Class.$define(&#x27;MyClass&#x27;, {
- that: function(){}
-});
-MyClass.$create().$exchange(require(&#x27;http&#x27;).Server); &#x2F;&#x2F; MyClass is now an instanceof Server</pre>
+    <pre class="sunlight-highlight-javascript">var MyClass = ES5Class.$define(&#x27;MyClass&#x27;, { that: function(){}});MyClass.$create().$exchange(require(&#x27;http&#x27;).Server); &#x2F;&#x2F; MyClass is now an instanceof Server</pre>
 
 
     
@@ -2926,9 +2947,7 @@ of the application</p>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">var YourClass = ES5Class.$define(&#x27;YourClass&#x27;);
-var instance = new YourClass();
-instance.$import(Error); &#x2F;&#x2F; make your instance act like if it was an Error</pre>
+    <pre class="sunlight-highlight-javascript">var YourClass = ES5Class.$define(&#x27;YourClass&#x27;);var instance = new YourClass();instance.$import(Error); &#x2F;&#x2F; make your instance act like if it was an Error</pre>
 
 
     
