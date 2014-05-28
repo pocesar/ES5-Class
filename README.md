@@ -3,7 +3,7 @@
 [![devDependency Status](https://david-dm.org/pocesar/es5-class/dev-status.svg)](https://david-dm.org/pocesar/es5-class#info=devDependencies)
 [![Github Repository](http://img.shields.io/badge/github-repo-orange.svg)](https://github.com/pocesar/ES5-Class)
 
-[![browser support](https://ci.testling.com/pocesar/ES5-Class.png)](https://ci.testling.com/pocesar/ES5-Class)
+<!-- [![browser support](https://ci.testling.com/pocesar/ES5-Class.png)](https://ci.testling.com/pocesar/ES5-Class) -->
 
 [![NPM](https://nodei.co/npm/es5class.png?downloads=true)](https://nodei.co/npm/es5class/)
 

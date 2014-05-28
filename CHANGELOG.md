@@ -1,5 +1,5 @@
 ## 2.1.1
-* Tests for the browser, change mocha to bdd
+* Tests for the browser, change mocha to bdd. Testling doesn't work, but `index.html` test works
 * Bump internal version
 
 ## 2.1.0
