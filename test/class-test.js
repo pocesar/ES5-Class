@@ -548,7 +548,7 @@ describe('ES5Class', function (){
   });
 
   it('setImmediate', function (done){
-    if (typeof window !== undefined) {
+    if (typeof window !== 'undefined') {
       // skip for browser
       return done();
     }
@@ -584,7 +584,7 @@ describe('ES5Class', function (){
     expect(MyError.$create() instanceof Error).to.be(false);
     expect(MyError.$create().$instanceOf(Error)).to.be(true);
 
-    if (typeof window !== undefined) {
+    if (typeof window !== 'undefined') {
       // skip for browser
       return done();
     }
@@ -608,7 +608,7 @@ describe('ES5Class', function (){
   });
 
   it('$inherit from buffer', function (done){
-    if (typeof window !== undefined) {
+    if (typeof window !== 'undefined') {
       // skip for browser
       return done();
     }
@@ -773,7 +773,7 @@ describe('ES5Class', function (){
   });
 
   it('implement EventEmitter', function (done){
-    if (typeof window !== undefined) {
+    if (typeof window !== 'undefined') {
       // skip for browser
       return done();
     }
