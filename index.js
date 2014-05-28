@@ -658,7 +658,7 @@
    * @static
    */
   Object.defineProperty(ES5Class, '$version', {
-    value: '2.0.0'
+    value: '2.1.1'
   });
 
   /**

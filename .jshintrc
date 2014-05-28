@@ -13,7 +13,13 @@
   "node"    : true,
   "quotmark": "single",
   "globals": {
-    "define": true
+    "define": true,
+    "it":true,
+    "describe":true,
+    "expect":true,
+    "before":true,
+    "after":true,
+    "ES5Class":true
   },
   "proto"   : true,
   "sub"     : true

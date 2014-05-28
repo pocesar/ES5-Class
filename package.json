@@ -1,6 +1,6 @@
 {
   "name": "es5class",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "description": "Prototypal inheritance based on ES5 Object.create and Object.defineProperty for node.js and modern browsers",
   "keywords": [
     "es5",
@@ -41,7 +41,7 @@
   },
   "testling": {
     "harness": "mocha-exports",
-    "files": "test/class-test.js",
+    "files": ["test/globals.js","test/class-test.js"],
     "browsers": [
       "ie/8",
       "ie/9",

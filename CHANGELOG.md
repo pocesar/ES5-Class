@@ -1,3 +1,7 @@
+## 2.1.1
+* Tests for the browser, change mocha to bdd
+* Bump internal version
+
 ## 2.1.0
 * 100% test coverage
 * `$className` available in instance as well
