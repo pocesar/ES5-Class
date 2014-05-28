@@ -64,9 +64,6 @@
   }
 
   function count(obj) {
-    if (obj === null || obj === undefined) {
-      return 0;
-    }
     var out = 0, i = null;
     for (i in obj) {
       out++;
@@ -81,7 +78,7 @@
 
   function isObject(obj){
     return obj !== undefined && obj !== null && obj.constructor !== undefined &&
-      obj.constructor === Object;
+    (obj.constructor === Object || typeof obj === 'object');
   }
 
   function isFunction(obj){
@@ -111,7 +108,6 @@
 
   function isES5Class(object){
     return (isFunction(object) || isObject(object)) &&
-      object['prototype'] !== undefined &&
       object['$className'] !== undefined &&
       object['$class'] !== undefined &&
       object.$class === object.constructor;
@@ -373,6 +369,19 @@
               })(Constructor)
             },
             /**
+             * @memberof ES5Class
+             * @member {String} $className
+             * @see ES5Class.$className
+             * @instance
+             */
+            '$className': {
+              'get': (function (object){
+                return function $className(){
+                  return object.$className;
+                };
+              })(Constructor)
+            },
+            /**
              * The arguments that instantiated this class
              *
              * @example
@@ -500,10 +509,7 @@
               if (descriptor !== undefined && (configurables[key] !== undefined || descriptor.set !== undefined || descriptor.get !== undefined)) {
                 Object.defineProperty(self.prototype, key, descriptor);
               } else if (key !== 'prototype') {
-                if (isES5Class(obj[key])) {
-                  // ES5Class, start over
-                  self.$include(obj[key]);
-                } else if (isFunction(obj[key])) {
+                if (isFunction(obj[key])) {
                   // Wrap function for $super
                   wrap = functionWrapper(key, obj, (isFunction(self.prototype[key]) ? self.prototype[key] : noop), self.prototype);
 

@@ -362,6 +362,15 @@ module.exports = {
 
       expect(newCls).to.have.property('stackTraceLimit');
       expect(newCls).to.have.property('fromStaticToPrototype');
+
+      newCls = new NewCls();
+      newCls.$import([function(){
+        return {'fromClosure': function(){
+
+        }};
+      }]);
+
+      expect(newCls).to.have.property('fromClosure');
     },
 
     'subclassing': function (){
@@ -1124,6 +1133,18 @@ module.exports = {
       expect(beagle.cry()).to.equal('wof!');
     },
 
+    '$include with a child ES5Class': function(){
+      var
+        Klass = Class.$define('Klass'),
+        obj = {
+          klass: new Klass()
+        }, Base = Class.$define('Base');
+
+      Base.$include(obj);
+
+      expect(Base.$create().klass).to.be(obj.klass);
+    },
+
     'extending base': function (){
       var Base = Class.$define('Base', {
         done: function (){
@@ -1304,6 +1325,8 @@ module.exports = {
       expect(bird.$class.$parent.$className).to.equal('Animal');
 
       expect(dog.$class.$className).to.equal('Dog');
+      expect(dog.$className).to.equal('Dog');
+      expect(dog.$className).to.equal(dog.$class.$className);
       expect(dog.$class.$parent.$className).to.equal('Animal');
       expect(beagle.$class.$className).to.equal('Beagle');
       expect(beagle.$class.$parent.$className).to.equal('Animal');

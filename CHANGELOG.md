@@ -1,3 +1,7 @@
+## 2.1.0
+* 100% test coverage
+* `$className` available in instance as well
+
 ## 2.0.1
 * Fix tests for Travis and Testling
 * Drop Node.js 0.8 support
