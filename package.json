@@ -40,7 +40,7 @@
     "ink-docstrap": "*"
   },
   "testling": {
-    "harness": "mocha-exports",
+    "harness": "mocha-bdd",
     "files": ["test/globals.js","test/class-test.js"],
     "browsers": [
       "ie/8",
