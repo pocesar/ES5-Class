@@ -230,9 +230,9 @@
           return splat(Constructor, '$create', args);
         }
 
-        superApply(this, Constructor, args);
-
-        spo(this, Constructor.prototype); // always need to restore prototype after superApply
+        if (superApply(this, Constructor, args)) {
+          spo(this, Constructor.prototype); // always need to restore prototype after superApply
+        }
 
         // old school new operator, call the constructor
         if (this.construct && this.construct !== noop) {
@@ -461,12 +461,13 @@
     value: function $create(){
       var
         self = this,
-        instance = Object.create(null),
+        instance = self.$apply.length ? Object.create(null) : Object.create(self.prototype),
         args = BetterCurry.flatten(arguments);
 
-      superApply(instance, self, args);
 
-      spo(instance, self.prototype); // always need to restore prototype after superApply
+      if (superApply(instance, self, args)){
+        spo(instance, self.prototype); // always need to restore prototype after superApply
+      }
 
       if (instance.construct && instance.construct !== noop) {
         splat(instance, 'construct', args);
