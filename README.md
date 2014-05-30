@@ -540,16 +540,16 @@ $ npm install && npm run benchmark
 A benchmark result in a 1st gen Core i3:
 
 ```
-class instance function call x 114,660,575 ops/sec ±7.30% (32 runs sampled)
-class method function call x 118,824,558 ops/sec ±4.74% (57 runs sampled)
-class instance included function call x 98,900,288 ops/sec ±3.71% (56 runs sampled)
-$super instance function calls x 14,078,465 ops/sec ±0.55% (97 runs sampled)
-$super class function calls x 13,880,657 ops/sec ±0.43% (99 runs sampled)
-$super inherited two levels deep function calls x 4,664,890 ops/sec ±0.51% (96 runs sampled)
-class.$create instantiation x 1,617,001 ops/sec ±1.60% (90 runs sampled)
-new operator x 2,493,494 ops/sec ±0.32% (101 runs sampled)
-obj() instance x 1,076,858 ops/sec ±0.88% (91 runs sampled)
-Class definition x 12,307 ops/sec ±2.76% (83 runs sampled)
+class instance function call x 114,056,673 ops/sec ±6.33% (33 runs sampled)
+class method function call x 114,195,944 ops/sec ±3.86% (70 runs sampled)
+class instance included function call x 105,647,876 ops/sec ±4.55% (43 runs sampled)
+$super instance function calls x 14,142,842 ops/sec ±0.40% (98 runs sampled)
+$super class function calls x 13,981,525 ops/sec ±0.27% (99 runs sampled)
+$super inherited two levels deep function calls x 6,966,387 ops/sec ±0.42% (97 runs sampled)
+class.$create instantiation x 1,901,561 ops/sec ±1.51% (90 runs sampled)
+new operator x 4,526,628 ops/sec ±0.70% (97 runs sampled)
+obj() instance x 1,246,228 ops/sec ±2.01% (89 runs sampled)
+ES5Class.$define x 12,414 ops/sec ±2.40% (86 runs sampled)
 ```
 
 <!--- old performance data, kept for historic reasons
