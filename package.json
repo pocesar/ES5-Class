@@ -1,6 +1,6 @@
 {
   "name": "es5class",
-  "version": "2.1.1",
+  "version": "2.2.0",
   "description": "Prototypal inheritance based on ES5 Object.create and Object.defineProperty for node.js and modern browsers",
   "keywords": [
     "es5",

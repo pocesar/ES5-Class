@@ -1,3 +1,6 @@
+## 2.2.0
+* Improve `new` and `$create` operators performance
+
 ## 2.1.1
 * Tests for the browser, change mocha to bdd. Testling doesn't work, but `index.html` test works
 * Bump internal version

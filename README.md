@@ -16,22 +16,20 @@ and provide helper functions along all your instances.
 
 Why should we write code like if we were in 2010? Read on!
 
-* Inheritance made easy
+* Multiple inheritance made easy 
 * It's freaking fast, check the [benchmark section](#benchmark)
 * Uses `Object.setPrototypeOf` (when available, using `__proto__` when isn't), `Object.create` and `Object.defineProperty` ES5/ES6 methods to enable native prototypal inheritance with proper settings (enumerable, configurable, writable)
-* Works with Node.js 0.8.x and up, and modern browsers.
+* Works with Node.js 0.8.x and up, and modern browsers (IE11, Firefox, Chrome, Safari).
 * Functions to implement other class methods and include other instance/prototype methods
-* The `$implement` method imports both prototype and class methods
-* The `$include` method imports prototype methods, and class methods as prototype
+    * The `$implement` method imports both prototype and class methods
+    * The `$include` method imports prototype methods, and class methods as prototype
 * Takes advantage of ES5 non-writable properties to disable the possibility of messing up the classes
-* Ability to inherit from multiple classes using arrays using `Class.$define('YourClass', [Class1, Class2, Class3])` without setting the `$parent` class, working like a mixin
-* Inject and call `$super` to reach the parent instance class function or extended class method
-* Call `this.$parent` to reach the parent class definition
-* Inject mixin code (as plain objects, functions or other classes) using `$include`/`$implement`
-* Extend static class methods and properties with `$implement`
-* `$implements` array property contain all classes that were implemented into the current class
+* Ability to inherit from multiple classes using arrays using `Class.$define('YourClass', [Class1, Class2, Class3])` without setting the `$parent` class, working like mixins/traits
+* Inject and call `$super` to reach the parent instance class functions or extended class method
+* Call `this.$parent` to reach the parent class definition inside your methods
+* `this.$implements` array property contain all classes that were implemented into the current class instance
 * The `construct` method is called with arguments when the class is instantiated
-* `$class` is available everywhere, it returns the current class, even before instantiation
+* `this.$class` is available everywhere, it returns the current class, even before instantiation
 * You are free to instantiate your class using `Class.$create(arguments)`, `Class(arguments)` and `new Class(arguments)`
 
 ## Breaking changes
