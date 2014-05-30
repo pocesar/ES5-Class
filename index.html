@@ -85,22 +85,22 @@
 and provide helper functions along all your instances.</p>
 <p>Why should we write code like if we were in 2010? Read on!</p>
 <ul>
-<li>Inheritance made easy</li>
+<li>Multiple inheritance made easy </li>
 <li>It's freaking fast, check the <a href="#benchmark">benchmark section</a></li>
 <li>Uses <code>Object.setPrototypeOf</code> (when available, using <code>__proto__</code> when isn't), <code>Object.create</code> and <code>Object.defineProperty</code> ES5/ES6 methods to enable native prototypal inheritance with proper settings (enumerable, configurable, writable)</li>
-<li>Works with Node.js 0.8.x and up, and modern browsers.</li>
-<li>Functions to implement other class methods and include other instance/prototype methods</li>
+<li>Works with Node.js 0.8.x and up, and modern browsers (IE11, Firefox, Chrome, Safari).</li>
+<li>Functions to implement other class methods and include other instance/prototype methods<ul>
 <li>The <code>$implement</code> method imports both prototype and class methods</li>
 <li>The <code>$include</code> method imports prototype methods, and class methods as prototype</li>
+</ul>
+</li>
 <li>Takes advantage of ES5 non-writable properties to disable the possibility of messing up the classes</li>
-<li>Ability to inherit from multiple classes using arrays using <code>Class.$define('YourClass', [Class1, Class2, Class3])</code> without setting the <code>$parent</code> class, working like a mixin</li>
-<li>Inject and call <code>$super</code> to reach the parent instance class function or extended class method</li>
-<li>Call <code>this.$parent</code> to reach the parent class definition</li>
-<li>Inject mixin code (as plain objects, functions or other classes) using <code>$include</code>/<code>$implement</code></li>
-<li>Extend static class methods and properties with <code>$implement</code></li>
-<li><code>$implements</code> array property contain all classes that were implemented into the current class</li>
+<li>Ability to inherit from multiple classes using arrays using <code>Class.$define('YourClass', [Class1, Class2, Class3])</code> without setting the <code>$parent</code> class, working like mixins/traits</li>
+<li>Inject and call <code>$super</code> to reach the parent instance class functions or extended class method</li>
+<li>Call <code>this.$parent</code> to reach the parent class definition inside your methods</li>
+<li><code>this.$implements</code> array property contain all classes that were implemented into the current class instance</li>
 <li>The <code>construct</code> method is called with arguments when the class is instantiated</li>
-<li><code>$class</code> is available everywhere, it returns the current class, even before instantiation</li>
+<li><code>this.$class</code> is available everywhere, it returns the current class, even before instantiation</li>
 <li>You are free to instantiate your class using <code>Class.$create(arguments)</code>, <code>Class(arguments)</code> and <code>new Class(arguments)</code></li>
 </ul>
 <h2>Breaking changes</h2><p>Version 1.x had <code>this.$super</code> call, but it wasn't &quot;async safe&quot;. If you would execute it in an asynchronous (<code>setImmediate</code>,
@@ -503,16 +503,16 @@ The <code>ES5Class.$define</code> is a real bottleneck (as low as 10k ops/s). So
 <pre><code class="lang-bash">$ npm install &amp;&amp; npm run benchmark
 </code></pre>
 <p>A benchmark result in a 1st gen Core i3:</p>
-<pre><code>class instance function call x 114,660,575 ops/sec ±7.30% (32 runs sampled)
-class method function call x 118,824,558 ops/sec ±4.74% (57 runs sampled)
-class instance included function call x 98,900,288 ops/sec ±3.71% (56 runs sampled)
-$super instance function calls x 14,078,465 ops/sec ±0.55% (97 runs sampled)
-$super class function calls x 13,880,657 ops/sec ±0.43% (99 runs sampled)
-$super inherited two levels deep function calls x 4,664,890 ops/sec ±0.51% (96 runs sampled)
-class.$create instantiation x 1,617,001 ops/sec ±1.60% (90 runs sampled)
-new operator x 2,493,494 ops/sec ±0.32% (101 runs sampled)
-obj() instance x 1,076,858 ops/sec ±0.88% (91 runs sampled)
-Class definition x 12,307 ops/sec ±2.76% (83 runs sampled)
+<pre><code>class instance function call x 114,056,673 ops/sec ±6.33% (33 runs sampled)
+class method function call x 114,195,944 ops/sec ±3.86% (70 runs sampled)
+class instance included function call x 105,647,876 ops/sec ±4.55% (43 runs sampled)
+$super instance function calls x 14,142,842 ops/sec ±0.40% (98 runs sampled)
+$super class function calls x 13,981,525 ops/sec ±0.27% (99 runs sampled)
+$super inherited two levels deep function calls x 6,966,387 ops/sec ±0.42% (97 runs sampled)
+class.$create instantiation x 1,901,561 ops/sec ±1.51% (90 runs sampled)
+new operator x 4,526,628 ops/sec ±0.70% (97 runs sampled)
+obj() instance x 1,246,228 ops/sec ±2.01% (89 runs sampled)
+ES5Class.$define x 12,414 ops/sec ±2.40% (86 runs sampled)
 </code></pre><!--- old performance data, kept for historic reasons
 ```
 class instance function call x 1,598,593 ops/sec ±1.33% (92 runs sampled)
@@ -562,7 +562,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p></article>
 					
 		<span class="jsdoc-message">
 		Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha5</a>
-		on 28 / 05 / 2014 using the <a href="https://github.com/terryweiss/docstrap">DocStrap template</a>.
+		on 30 / 05 / 2014 using the <a href="https://github.com/terryweiss/docstrap">DocStrap template</a>.
 		</span>
 				</footer>
 			</div>
