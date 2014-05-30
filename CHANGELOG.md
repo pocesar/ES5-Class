@@ -1,4 +1,4 @@
-## 2.2.0
+## 2.1.2
 * Improve `new` and `$create` operators performance
 
 ## 2.1.1
