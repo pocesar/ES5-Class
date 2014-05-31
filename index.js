@@ -629,7 +629,7 @@
    * @param {Boolean} toPrototype Append to this class prototype instead
    * @static
    *
-   * @returns {ES5Class}
+   * @returns {ES5Class} Return itself so it can be chained
    */
   Object.defineProperty(ES5Class, '$const', {
     value: function $const(values, toPrototype) {
@@ -672,7 +672,7 @@
    * @param {String} [name] Name of the object if it's not already an {@link ES5Class}
    * @static
    *
-   * @returns {ES5Class}
+   * @returns {ES5Class} Always return a class, even an empty one
    */
   Object.defineProperty(ES5Class, '$wrap', {
     value: function $wrap(obj, name){
