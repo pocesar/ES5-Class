@@ -1,3 +1,7 @@
+## 2.2.0
+* Add `$wrap` method, makes any function or object an ES5Class
+* Add `$const` for Object.defineProperty `writable: false`
+
 ## 2.1.2
 * Improve `new` and `$create` operators performance
 

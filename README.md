@@ -17,6 +17,7 @@ and provide helper functions along all your instances.
 Why should we write code like if we were in 2010? Read on!
 
 * Multiple inheritance made easy 
+* Support `get`, `set`, `__defineGetter__`, `__defineSetter__` without any extra code
 * It's freaking fast, check the [benchmark section](#benchmark)
 * Uses `Object.setPrototypeOf` (when available, using `__proto__` when isn't), `Object.create` and `Object.defineProperty` ES5/ES6 methods to enable native prototypal inheritance with proper settings (enumerable, configurable, writable)
 * Works with Node.js 0.8.x and up, and modern browsers (IE11, Firefox, Chrome, Safari).

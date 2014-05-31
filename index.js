@@ -180,9 +180,7 @@
   /*istanbul ignore next:placeholder*/
   function ES5Class(){ }
 
-  ES5Class.prototype = {
-    construct: noop
-  };
+  ES5Class.prototype.construct = noop;
 
   /**
    * Define a new class
@@ -445,11 +443,14 @@
   });
 
   /**
-   * Create a new instance of your class
+   * Create a new instance of your class. It returns the instance, so
+   * you can chain methods.
    *
    * @example
-   *   var YourDefinedClass = ES5Class.$define('YourDefinedClass');
-   *   YourDefinedClass.$create('some', 'arguments');
+   *   var YourDefinedClass = ES5Class.$define('YourDefinedClass', {
+   *     instanceMethod: function(){}
+   *   });
+   *   YourDefinedClass.$create('some', 'arguments').instanceMethod();
    *
    * @param {...*} [...] Any parameters
    * @function $create
@@ -611,6 +612,75 @@
   });
 
   /**
+   * Define enumerable but read only methods or fields
+   *
+   * @example
+   *   var MyClass = ES5Class.$define('MyClass');
+   *   MyClass.$const({
+   *     myValue: 1
+   *   });
+   *   MyClass.myValue = 0; // MyClass.myValue is still 1
+   *   //throws Error if in strict mode
+   *
+   * @memberof ES5Class
+   * @function $const
+   *
+   * @param {(Function|Object)} values Object containing the key: values, or a function that returns an object
+   * @param {Boolean} toPrototype Append to this class prototype instead
+   * @static
+   *
+   * @returns {ES5Class}
+   */
+  Object.defineProperty(ES5Class, '$const', {
+    value: function $const(values, toPrototype) {
+      var target = this;
+      if (toPrototype === true) {
+        target = this.prototype;
+      }
+
+      if (isPlainFunction(values)){
+        values = values.call(this);
+        if (isObject(values)) {
+          this.$const(values, toPrototype);
+        }
+      } else if (isObject(values)) {
+        for (var i in values) {
+          Object.defineProperty(target, i, {
+            value: values[i],
+            enumerable: true
+          });
+        }
+      }
+
+      return this;
+    }
+  });
+
+  /**
+   * Ensure the given param is an ES5Class before trying to call any ES5Class
+   * specific functions.
+   *
+   * @example
+   *   var MyClass = {'doh': true};
+   *   ES5Class.$isES5Class(MyClass); // false
+   *   ES5Class.$isES5Class(ES5Class.$wrap(MyClass)); // true, named Wrapped
+   *   ES5Class.$isES5Class(ES5Class.$wrap(MyClass, 'MyClass')); // true, named MyClass
+   *
+   * @function $wrap
+   * @memberof ES5Class
+   * @param {*} obj Object to wrap as a function
+   * @param {String} [name] Name of the object if it's not already an {@link ES5Class}
+   * @static
+   *
+   * @returns {ES5Class}
+   */
+  Object.defineProperty(ES5Class, '$wrap', {
+    value: function $wrap(obj, name){
+      return isES5Class(obj) ? obj : ES5Class.$define(name || 'Wrapped', obj);
+    }
+  });
+
+  /**
    * Inherits from an existing class, apply the constructor automatically
    *
    * @example
@@ -659,7 +729,7 @@
    * @static
    */
   Object.defineProperty(ES5Class, '$version', {
-    value: '2.1.2'
+    value: '2.2.0'
   });
 
   /**
@@ -742,7 +812,7 @@
    */
   Object.defineProperty(ES5Class.prototype, '$exchange', {
     value: function $exchange(obj, args){
-      if ((isFunction(obj) || isObject(obj)) && obj.prototype != null) {
+      if ((isFunction(obj) || isObject(obj)) && obj.prototype !== undefined) {
         var _args = this.$arguments;
 
         spo(this, obj.prototype);

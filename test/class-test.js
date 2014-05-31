@@ -1,5 +1,6 @@
 describe('ES5Class', function (){
   var
+    onTheBrowser = (typeof window !== 'undefined' && window === global),
     Animal,
     Bird,
     Dog,
@@ -273,7 +274,7 @@ describe('ES5Class', function (){
   });
 
   it('exchange proto', function (done){
-    if (typeof window !== 'undefined') {
+    if (onTheBrowser) {
       // skip on browser
       return done();
     }
@@ -452,7 +453,7 @@ describe('ES5Class', function (){
   });
 
   it('import getters and setters', function (done){
-    if (typeof window !== 'undefined') {
+    if (onTheBrowser) {
       // skip for browser
       return done();
     }
@@ -475,6 +476,21 @@ describe('ES5Class', function (){
     Cls.testSetter = 'stuff';
     expect(Cls.value).to.equal('stuff');
     expect(obj.value).to.be.an('undefined');
+
+    obj = {
+      that: '',
+      get val () {
+        return this.that;
+      },
+      set val (val) {
+        this.that = val;
+      }
+    };
+
+    Cls.$implement(obj);
+    expect(Cls.that).to.be('');
+    Cls.val = 10;
+    expect(Cls.val).to.be(10);
 
     done();
   });
@@ -504,7 +520,7 @@ describe('ES5Class', function (){
 
     expect((new NewCls('yes')).called()).to.equal('yes: no');
 
-    if (typeof window === undefined) {
+    if (!onTheBrowser) {
       // skip for browser
       var
         NewBuffer = ES5Class.$define('NewBuffer', {
@@ -548,7 +564,7 @@ describe('ES5Class', function (){
   });
 
   it('setImmediate', function (done){
-    if (typeof window !== 'undefined') {
+    if (onTheBrowser) {
       // skip for browser
       return done();
     }
@@ -584,7 +600,7 @@ describe('ES5Class', function (){
     expect(MyError.$create() instanceof Error).to.be(false);
     expect(MyError.$create().$instanceOf(Error)).to.be(true);
 
-    if (typeof window !== 'undefined') {
+    if (onTheBrowser) {
       // skip for browser
       return done();
     }
@@ -608,7 +624,7 @@ describe('ES5Class', function (){
   });
 
   it('$inherit from buffer', function (done){
-    if (typeof window !== 'undefined') {
+    if (onTheBrowser) {
       // skip for browser
       return done();
     }
@@ -630,6 +646,111 @@ describe('ES5Class', function (){
     expect(buf.length).to.equal(4);
     expect((new MyBuffer()).length).to.be(4);
     done();
+  });
+
+  describe('$wrap', function(){
+    it('wraps functions or objects', function(){
+      var obj = {}, fn = function(){};
+
+      obj = ES5Class.$wrap(obj);
+      fn = ES5Class.$wrap(fn);
+      expect(obj.$className).to.be('Wrapped');
+      expect(fn.$className).to.be('Wrapped');
+      expect(ES5Class.$wrap(obj)).to.be(obj);
+      expect(ES5Class.$wrap(fn)).to.be(fn);
+    });
+
+    it('ignores invalid parameters', function(){
+      var bool = false, str = '';
+
+      expect(ES5Class.$wrap(bool).$create().$names).to.eql([]);
+      expect(ES5Class.$wrap(str).$create().$names).to.eql([]);
+    });
+
+    it('existing ES5Class are returned by default', function(){
+      var Cls = ES5Class.$define('Cls');
+
+      expect(ES5Class.$wrap(Cls)).to.be(Cls);
+    });
+  });
+
+  describe('$const', function(){
+    it('readonly', function(){
+      var obj = {
+          cant:'touch this',
+          fn : function(){ return this.cant; },
+          get s(){ return this.cant; },
+          set s(v){ this.cant = v; }
+        },
+        Cls = ES5Class.$define('Cls');
+
+      Cls.$const(obj);
+      expect(Cls.cant).to.be('touch this');
+      expect(Cls.fn()).to.be('touch this');
+      expect(Cls.s).to.be('touch this');
+      Cls.cant = true;
+      Cls.s = true;
+      expect(Cls.cant).to.be('touch this');
+      delete Cls.cant;
+      expect(Cls.cant).to.be('touch this');
+      expect(Cls.s).to.be('touch this');
+      expect(Cls.fn()).to.be('touch this');
+    });
+
+    it('throws in strict mode', function(){
+      'use strict';
+
+      var Cls = ES5Class.$define('Cls').$const({
+        isConst: true
+      });
+
+      expect(function(){
+        Cls.isConst = false;
+      }).to.throwException();
+    });
+
+    it('accepts a function', function(){
+      var Cls = ES5Class.$define('Cls');
+
+      Cls.$const(function(){
+        expect(this).to.be(Cls);
+
+        return {
+          constant: 1
+        };
+      });
+
+      expect(Cls.constant).to.be(1);
+    });
+
+    it('appends to prototype', function(){
+      var Cls = ES5Class.$define('Cls');
+
+      Cls.$const(function(){
+        expect(this).to.be(Cls);
+
+        return {
+          constant: 1
+        };
+      }, true);
+
+      expect(Cls.constant).to.be(undefined);
+      expect(Cls().constant).to.be(1);
+    });
+
+    it('invalid $const', function(){
+      var Cls = ES5Class.$define('Cls');
+
+      expect(function(){
+        Cls.$const(false);
+        Cls.$const('');
+        Cls.$const(0);
+        Cls.$const(0, true);
+        Cls.$const('', true);
+        Cls.$const(true, true);
+        Cls.$const(function(){});
+      }).to.not.throwException();
+    });
   });
 
   it('$delegate', function (){
@@ -773,7 +894,7 @@ describe('ES5Class', function (){
   });
 
   it('implement EventEmitter', function (done){
-    if (typeof window !== 'undefined') {
+    if (onTheBrowser) {
       // skip for browser
       return done();
     }
