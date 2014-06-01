@@ -922,7 +922,9 @@
 
   /**
    * Returns true if the current instance is an instance of the class
-   * definition passed parameter
+   * definition passed parameter. It goes beyond strict `isPrototypeOf` check,
+   * it also check for mixin'd classes (through {@link ES5Class.$implement} or
+   * {@link ES5Class.$inherit}).
    *
    * @param {(Function|Object)} object You pass in either an object or function (that is a {@link ES5Class}) for checking
    * @function $instanceOf
@@ -938,7 +940,7 @@
       return object &&
       (
         (object.prototype && object.prototype.isPrototypeOf(self)) ||
-        (object.isPrototypeOf && object.isPrototypeOf(self)) ||
+        (self.isPrototypeOf(object)) ||
         applyArray(self.$class, object, null, true)
       );
     }

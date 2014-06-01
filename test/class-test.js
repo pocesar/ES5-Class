@@ -736,6 +736,14 @@ describe('ES5Class', function (){
 
       expect(Cls.constant).to.be(undefined);
       expect(Cls().constant).to.be(1);
+
+      var inst = Cls.$create();
+
+      expect(function(){
+        inst.$destroy();
+      }).to.not.throwException();
+
+      expect(inst.constant).to.be(1);
     });
 
     it('invalid $const', function(){
