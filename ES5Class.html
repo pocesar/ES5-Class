@@ -246,8 +246,7 @@ to this class upon instantiation</p>
 <dd>
     
     <div class="description">
-        <p>Get the current class name.</p>
-<p>Gets overwritten in <a href="ES5Class.html#$define">ES5Class.$define</a></p>
+        <p>The current class name</p>
     </div>
     
     
@@ -308,7 +307,8 @@ to this class upon instantiation</p>
 <dd>
     
     <div class="description">
-        <p>The current class name</p>
+        <p>Get the current class name.</p>
+<p>Gets overwritten in <a href="ES5Class.html#$define">ES5Class.$define</a></p>
     </div>
     
     
@@ -619,63 +619,6 @@ to ES5Class if not derived from any other class.</p>
 </dt>
 <dd>
     
-    
-    
-        <h5>Type:</h5>
-        <ul>
-            <li>
-                
-<span class="param-type"><a href="ES5Class.html">ES5Class</a></span>
-
-
-            </li>
-        </ul>
-    
-
-    
-<dl class="details">
-	
-
-	
-
-	
-
-	
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-
-	
-
-	
-
-	
-</dl>
-
-    
-    
-</dd>
-
-        
-            
-<dt>
-    <h4 class="name" id="$class"><span class="type-signature"></span>$class<span class="type-signature"> :<a href="ES5Class.html">ES5Class</a></span></h4>
-    
-    
-</dt>
-<dd>
-    
     <div class="description">
         <p>Get the current class definition created with <a href="ES5Class.html#$define">ES5Class.$define</a></p>
     </div>
@@ -740,6 +683,63 @@ to ES5Class if not derived from any other class.</p>
     <div class="description">
         <p>The constructor of this class</p>
     </div>
+    
+    
+    
+        <h5>Type:</h5>
+        <ul>
+            <li>
+                
+<span class="param-type"><a href="ES5Class.html">ES5Class</a></span>
+
+
+            </li>
+        </ul>
+    
+
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <h4 class="name" id="$class"><span class="type-signature"></span>$class<span class="type-signature"> :<a href="ES5Class.html">ES5Class</a></span></h4>
+    
+    
+</dt>
+<dd>
     
     
     
@@ -1054,6 +1054,176 @@ to ES5Class if not derived from any other class.</p>
         <dl>
             
 <dt>
+    <h4 class="name" id="$const"><span class="type-signature">&lt;static> </span>$const<span class="signature">(values, toPrototype)</span><span class="type-signature"> &rarr; {<a href="ES5Class.html">ES5Class</a>}</span></h4>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Define enumerable but read only methods or fields</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>values</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+|
+
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Object containing the key: values, or a function that returns an object</p></td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>toPrototype</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Boolean</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Append to this class prototype instead</p></td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    <p>Return itself so it can be chained</p>
+</div>
+
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="ES5Class.html">ES5Class</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+        <h5>Example</h5>
+        
+    <pre class="sunlight-highlight-javascript">var MyClass = ES5Class.$define(&#x27;MyClass&#x27;);MyClass.$const({  myValue: 1});MyClass.myValue = 0; &#x2F;&#x2F; MyClass.myValue is still 1&#x2F;&#x2F;throws Error if in strict mode</pre>
+
+
+    
+</dd>
+
+        
+            
+<dt>
     <h4 class="name" id="$create"><span class="type-signature">&lt;static> </span>$create<span class="signature">()</span><span class="type-signature"> &rarr; {<a href="ES5Class.html">ES5Class</a>}</span></h4>
     
     
@@ -1062,7 +1232,8 @@ to ES5Class if not derived from any other class.</p>
     
     
     <div class="description">
-        <p>Create a new instance of your class</p>
+        <p>Create a new instance of your class. It returns the instance, so
+you can chain methods.</p>
     </div>
     
 
@@ -1203,7 +1374,7 @@ to ES5Class if not derived from any other class.</p>
     
         <h5>Example</h5>
         
-    <pre class="sunlight-highlight-javascript">var YourDefinedClass = ES5Class.$define(&#x27;YourDefinedClass&#x27;);YourDefinedClass.$create(&#x27;some&#x27;, &#x27;arguments&#x27;);</pre>
+    <pre class="sunlight-highlight-javascript">var YourDefinedClass = ES5Class.$define(&#x27;YourDefinedClass&#x27;, {  instanceMethod: function(){}});YourDefinedClass.$create(&#x27;some&#x27;, &#x27;arguments&#x27;).instanceMethod();</pre>
 
 
     
@@ -2382,6 +2553,194 @@ super constructor will be called with no arguments.</p></td>
         
             
 <dt>
+    <h4 class="name" id="$wrap"><span class="type-signature">&lt;static> </span>$wrap<span class="signature">(obj, <span class="optional">name</span>)</span><span class="type-signature"> &rarr; {<a href="ES5Class.html">ES5Class</a>}</span></h4>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Ensure the given param is an ES5Class before trying to call any ES5Class
+specific functions.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+		<th>Argument</th>
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>obj</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">*</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>Object to wrap as a function</p></td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>name</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>Name of the object if it's not already an <a href="ES5Class.html">ES5Class</a></p></td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    <p>Always return a class, even an empty one</p>
+</div>
+
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="ES5Class.html">ES5Class</a></span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+        <h5>Example</h5>
+        
+    <pre class="sunlight-highlight-javascript">var MyClass = {&#x27;doh&#x27;: true};ES5Class.$isES5Class(MyClass); &#x2F;&#x2F; falseES5Class.$isES5Class(ES5Class.$wrap(MyClass)); &#x2F;&#x2F; true, named WrappedES5Class.$isES5Class(ES5Class.$wrap(MyClass, &#x27;MyClass&#x27;)); &#x2F;&#x2F; true, named MyClass</pre>
+
+
+    
+</dd>
+
+        
+            
+<dt>
     <h4 class="name" id="$delegate"><span class="type-signature"></span>$delegate<span class="signature">(<span class="optional">where</span>)</span><span class="type-signature"> &rarr; {BetterCurry.delegate}</span></h4>
     
     
@@ -2965,7 +3324,9 @@ of the application</p>
     
     <div class="description">
         <p>Returns true if the current instance is an instance of the class
-definition passed parameter</p>
+definition passed parameter. It goes beyond strict <code>isPrototypeOf</code> check,
+it also check for mixin'd classes (through <a href="ES5Class.html#$implement">ES5Class.$implement</a> or
+<a href="ES5Class.html#$inherit">ES5Class.$inherit</a>).</p>
     </div>
     
 
@@ -3116,7 +3477,7 @@ definition passed parameter</p>
 					
 		<span class="jsdoc-message">
 		Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha5</a>
-		on 30 / 05 / 2014 using the <a href="https://github.com/terryweiss/docstrap">DocStrap template</a>.
+		on 31 / 05 / 2014 using the <a href="https://github.com/terryweiss/docstrap">DocStrap template</a>.
 		</span>
 				</footer>
 			</div>
