@@ -18,7 +18,7 @@
     "dateFormat"       : "DD / MM / YYYY",
     "outputSourceFiles": false,
     "outputSourcePath" : false,
-    "systemName"       : "ES5Class",
+    "systemName"       : "Prototypal class inheritance for Node.js and the browser",
     "footer"           : "",
     "copyright"        : "",
     "navType"          : "inline",

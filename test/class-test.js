@@ -1578,6 +1578,33 @@ describe('ES5Class', function (){
 
   });
 
+  it('toString and valueOf', function(){
+    var Cls = ES5Class.$define('Cls', {
+      toString: function(){
+        return 'prototype';
+      }
+    }, {
+      toString: function(){
+        return 'static';
+      }
+    });
+
+    expect('' + Cls()).to.be('prototype');
+    expect('' + Cls).to.be('static');
+    Cls.$implement({
+      valueOf: function(){
+        return 'static valueOf';
+      }
+    });
+    Cls.$include({
+      valueOf: function(){
+        return 'prototype valueOf';
+      }
+    });
+    expect('' + Cls()).to.be('prototype valueOf');
+    expect('' + Cls).to.be('static valueOf');
+  });
+
   it('constructor', function (){
     expect(typeof Bird).to.be('function');
     expect(Bird.$create).to.be.a('function');
