@@ -31,7 +31,9 @@
       '$arguments': true,
       '$super': true,
       'prototype': true,
-      '$original': true
+      '$original': true,
+      '__length': true,
+      '$currentContext': true
     },
     hasSuperRegex = /\([^\$]*\$super[^\)]*\)(?=\s*\{)/m;
 
@@ -577,7 +579,13 @@
 
           for (var key in obj) {
             descriptor = gpd(obj, key);
-            if (descriptor !== undefined && (descriptor.set || descriptor.get)) {
+            if (descriptor !== undefined && (
+                descriptor.set ||
+                descriptor.get ||
+                descriptor.writable === false ||
+                descriptor.configurable === false ||
+                descriptor.enumerable === false)
+            ) {
               Object.defineProperty(self, key, descriptor);
             } else {
               if (key !== 'prototype') {
@@ -729,7 +737,7 @@
    * @static
    */
   Object.defineProperty(ES5Class, '$version', {
-    value: '2.2.0'
+    value: '2.2.1'
   });
 
   /**
@@ -945,10 +953,6 @@
       );
     }
   });
-
-  configurables = {
-    '$destroy': true
-  };
 
   return ES5Class;
 }));

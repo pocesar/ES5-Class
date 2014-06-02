@@ -495,6 +495,26 @@ describe('ES5Class', function (){
     done();
   });
 
+  describe('$implement', function(){
+
+    it('ES5Class', function(){
+      var Base = ES5Class.$define('Base', {
+        proto: 1
+      }, {
+        static: 1
+      }), Sub = ES5Class.$define('Sub');
+
+      Sub.$implement(Base);
+
+      expect(Sub.static).to.be(Base.static);
+      Base.proto = 2;
+      expect(Sub.static).to.be(1);
+      Base.prototype.proto = 2;
+      expect(Sub.$create().proto).to.be(1);
+    });
+
+  });
+
   it('old school new operator', function (done){
     var NewCls, Cls = ES5Class.$define('Cls', {
       construct: function (test){
@@ -758,6 +778,32 @@ describe('ES5Class', function (){
         Cls.$const(true, true);
         Cls.$const(function(){});
       }).to.not.throwException();
+    });
+
+    it('inherits const from base class', function(){
+      var
+        Base = ES5Class.$define('Base')
+          .$const({myConst: 1})
+          .$const({myProtoConst: 1}, true),
+        Sub = Base.$define('Sub');
+
+      expect(Sub.myConst).to.be(Base.myConst);
+      expect(Sub.$create().myProtoConst).to.be(Base.prototype.myProtoConst);
+    });
+
+    it('applies writable false when mixin', function(){
+      var
+        Base = ES5Class.$define('Base')
+          .$const({myConst: 1})
+          .$const({myProtoConst: 1}, true),
+        Sub = ES5Class.$define('Sub');
+
+      Sub.$implement(Base);
+      expect(Sub.myConst).to.be(Base.myConst);
+      expect(Sub.$create().myProtoConst).to.be(Base.prototype.myProtoConst);
+
+      Sub.myConst = 2;
+      expect(Sub.myConst).to.be(1);
     });
   });
 

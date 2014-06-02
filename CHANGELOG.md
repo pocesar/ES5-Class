@@ -1,3 +1,8 @@
+## 2.2.1
+* Changes to documentation, mostly `README.md`
+* Fixed bug that makes `$implement` apply descriptors correctly 
+* Performance tweaks
+
 ## 2.2.0
 * Add `$wrap` method, makes any function or object an ES5Class
 * Add `$const` for Object.defineProperty `writable: false`
