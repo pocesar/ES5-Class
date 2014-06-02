@@ -10,9 +10,8 @@
 	<![endif]-->
 	<link type="text/css" rel="stylesheet" href="styles/sunlight.default.css">
 
-	
 	<link type="text/css" rel="stylesheet" href="styles/site.united.css">
-	
+
 </head>
 
 <body>
@@ -72,15 +71,16 @@
 
 
 
-    <section>
+    <section class="readme-section">
         <article><p><a href="https://travis-ci.org/pocesar/ES5-Class"><img src="https://travis-ci.org/pocesar/ES5-Class.png?branch=master" alt="Build Status"></a>
 <a href="https://coveralls.io/r/pocesar/ES5-Class?branch=master"><img src="https://coveralls.io/repos/pocesar/ES5-Class/badge.png?branch=master" alt="Coverage Status"></a>
 <a href="https://david-dm.org/pocesar/es5-class#info=devDependencies"><img src="https://david-dm.org/pocesar/es5-class/dev-status.svg" alt="devDependency Status"></a>
-<a href="https://github.com/pocesar/ES5-Class"><img src="http://img.shields.io/badge/github-repo-orange.svg" alt="Github Repository"></a></p>
+<a href="https://github.com/pocesar/ES5-Class"><img src="http://img.shields.io/badge/github-repo-orange.svg" alt="Github Repository"></a>
+<img src="http://img.shields.io/badge/api-stable-brightgreen.svg" alt="API Stability: Stable"></p>
 <!-- [![browser support](https://ci.testling.com/pocesar/ES5-Class.png)](https://ci.testling.com/pocesar/ES5-Class) -->
 
 <p><a href="https://nodei.co/npm/es5class/"><img src="https://nodei.co/npm/es5class.png?downloads=true" alt="NPM"></a></p>
-<h1>ES5-Class</h1><p>A Class object that enables native prototypal inheritance for Node and modern browsers.</p>
+<h1>ES5-Class</h1><h2>Highlights</h2><p>A Class object that enables native prototypal inheritance for Node and modern browsers.</p>
 <p>It's called class because it encapsulate your methods, provide inheritance, set static and prototype methods and variables,
 and provide helper functions along all your instances.</p>
 <p>Why should we write code like if we were in 2010? Read on!</p>
@@ -89,14 +89,14 @@ and provide helper functions along all your instances.</p>
 <li>Support <code>get</code>, <code>set</code>, <code>__defineGetter__</code>, <code>__defineSetter__</code> without any extra code</li>
 <li>It's freaking fast, check the <a href="#benchmark">benchmark section</a></li>
 <li>Uses <code>Object.setPrototypeOf</code> (when available, using <code>__proto__</code> when isn't), <code>Object.create</code> and <code>Object.defineProperty</code> ES5/ES6 methods to enable native prototypal inheritance with proper settings (enumerable, configurable, writable)</li>
-<li>Works with Node.js 0.8.x and up, and modern browsers (IE11, Firefox, Chrome, Safari).</li>
+<li>Works with Node.js 0.8.x and up (including node-webkit), and really modern browsers (IE11, Firefox, Chrome, Safari).</li>
 <li>Functions to implement other class methods and include other instance/prototype methods<ul>
 <li>The <code>$implement</code> method imports both prototype and class methods</li>
 <li>The <code>$include</code> method imports prototype methods, and class methods as prototype</li>
 </ul>
 </li>
 <li>Takes advantage of ES5 non-writable properties to disable the possibility of messing up the classes</li>
-<li>Ability to inherit from multiple classes using arrays using <code>Class.$define('YourClass', [Class1, Class2, Class3])</code> without setting the <code>$parent</code> class, working like mixins/traits</li>
+<li>Ability to inherit from multiple classes using arrays using <code>ES5Class.$define('YourClass', [Class1, Class2, Class3])</code> without setting the <code>$parent</code> class, working like mixins/traits</li>
 <li>Inject and call <code>$super</code> to reach the parent instance class functions or extended class method</li>
 <li>Call <code>this.$parent</code> to reach the parent class definition inside your methods</li>
 <li><code>this.$implements</code> array property contain all classes that were implemented into the current class instance</li>
@@ -104,6 +104,7 @@ and provide helper functions along all your instances.</p>
 <li><code>this.$class</code> is available everywhere, it returns the current class, even before instantiation</li>
 <li>You are free to instantiate your class using <code>Class.$create(arguments)</code>, <code>Class(arguments)</code> and <code>new Class(arguments)</code></li>
 </ul>
+<h2>Documentation</h2><p>See docs in <a href="http://pocesar.github.io/ES5-Class">ES5Class Documentation</a></p>
 <h2>Breaking changes</h2><p>Version 1.x had <code>this.$super</code> call, but it wasn't &quot;async safe&quot;. If you would execute it in an asynchronous (<code>setImmediate</code>,
 <code>setTimeout</code>, inside Promises or other callbacks), <code>this.$super</code> could be either undefined or be another function, since
 <code>this.$super</code> was a global state variable on the instance.</p>
@@ -116,8 +117,8 @@ and provide helper functions along all your instances.</p>
     }
 });
 var Sub = Base.$define('Sub', {
-    construct: function(){
-        this.$super('that','those');
+    construct: function(those){
+        this.$super('that', those);
     }
 });
 
@@ -139,12 +140,8 @@ var Sub = Base.$define('Sub', {
 Sub.$create('those');
 </code></pre>
 <p><code>$super</code> is <em>merely</em> a shortcut for <code>this.$parent.prototype.fn.apply(this, arguments);</code> (actually a bit fancier than that).
-Nothing stops you from doing that by yourself (if you don't fancy the <code>$super</code> argument)</p>
+Nothing stops you from doing that by yourself (if you don't fancy the <code>$super</code> argument injection)</p>
 <p>In version 2.x you'll also need <a href="https://github.com/pocesar/js-bettercurry">better-curry</a> as a dependency.</p>
-<h5>Contributors</h5><ul>
-<li><a href="https://github.com/bfil">bfil</a></li>
-<li><a href="https://github.com/pocesar">pocesar</a></li>
-</ul>
 <h2>Install</h2><pre><code class="lang-bash">$ npm install es5class
 </code></pre>
 <pre><code class="lang-bash">$ bower install es5class
@@ -156,12 +153,11 @@ var ES5Class = require('es5class');
 window.ES5Class
 
 // or with RequireJS
-define(['ES5Class'], function(ES5Class){
+require(['ES5Class'], function(ES5Class){
 
 });
 </code></pre>
-<h2>Documentation</h2><p>See docs in <a href="http://pocesar.github.io/ES5-Class">ES5Class Documentation</a></p>
-<h2>Example usage</h2><h4>Creating a new class</h4><pre><code class="lang-javascript">var Animal = Class.$define(
+<h2>Example usage</h2><h4>Creating a new class</h4><pre><code class="lang-javascript">var Animal = ES5Class.$define(
   // Class Name
   'Animal',
   // Prototype methods/variables, these will only be available through a class instance, in this case, through Animal.$create('Name')
@@ -184,15 +180,21 @@ define(['ES5Class'], function(ES5Class){
 </code></pre>
 <h4>Class inheritance</h4><pre><code class="lang-javascript">var Bird = Animal.$define('Bird', {
   construct: function ($super, name, canFly){
+    // calls parent class constructor, calls Animal.prototype.construct 
+    // and set this.name
     if (canFly) {
       this.canFly = canFly;
     }
-    $super(name + ' Bird'); // calls parent class constructor, calls Animal.prototype.construct and set this.name = 'Yellow ' + name
+    $super(name + ' Bird'); 
   },
-  canFly   : false
+  // Bird.prototype.canFly
+  canFly   : false 
 });
 </code></pre>
-<h4>Extending a prototype</h4><pre><code class="lang-javascript">Bird.$include({ // include is like doing _.extend(Bird.prototype, {}) but with proper wrapping the methods for $super access
+<h4>Extending the prototype</h4><pre><code class="lang-javascript">// append functions to the prototype. existing functions in the prototype are 
+// wrapped for $super access
+Bird.$include({ 
+  // Bird.prototype.fly
   fly: function (){
     if (this.canFly) {
       console.log(this.name + ' flies!');
@@ -202,9 +204,10 @@ define(['ES5Class'], function(ES5Class){
   }
 });
 </code></pre>
-<h4>Implement</h4><pre><code class="lang-javascript">// &quot;Implement&quot; import prototype (if any) and class methods from the given object, to the class declaration and the prototype
+<h4>Add static and prototype members to the class</h4><pre><code class="lang-javascript">// &quot;Implement&quot; import the prototype (if it has a prototype) and class methods from the 
+// given object, to the class declaration
 var
-    Class1 = Class.$define('Class1'),
+    Class1 = ES5Class.$define('Class1'),
     obj = {yup: true},
     h = function(){};
 
@@ -215,11 +218,12 @@ Class1.$implement([obj, h]);
 console.log(Class1.yup); // true (imported to the class declaration)
 console.log(Class1.$create().nope); // false (imported to the prototype)
 </code></pre>
-<p>You can all the inheriting class construct by passing the second parameter, for example:</p>
+<p>You can call the inheriting class <code>$super</code> construct by passing true to the second parameter, 
+for example:</p>
 <pre><code class="lang-javascript">var EventEmitter = require('events').EventEmitter;
 
 // this code is the same as
-Class.$define('MyEventEmitter', function(){
+ES5Class.$define('MyEventEmitter', function(){
     this.$implement(EventEmitter);
 
     return {
@@ -230,16 +234,18 @@ Class.$define('MyEventEmitter', function(){
 });
 
 // this one (much cleaner)
-Class.$define('MyEventEmitter').$implement(EventEmitter, true);
+ES5Class.$define('MyEventEmitter').$implement(EventEmitter, true);
 
-// There's no need for the construct + implement if you are just creating an inheritance from another Node.js class
-// So it's easier to set the second parameter of implement to true, it will call the parent class constructor
-// automatically
+// There's no need for the construct + implement if you are just creating 
+// an inheritance from another Node.js class
+// So it's easier to set the second parameter of implement to true, it 
+// will call the parent class constructor automatically
 </code></pre>
-<p>Because it's really easy to forget to initialize the inheriting class</p>
-<h4>Include</h4><pre><code class="lang-javascript">// &quot;Implement&quot; import class methods *ONLY* from the given object, to the class declaration prototype *ONLY*
+<p>Because it's really easy to forget to initialize the super constructor of the inheriting class</p>
+<h4>Include (mixin) to the current prototype</h4><pre><code class="lang-javascript">// &quot;Implement&quot; import class methods *ONLY* from the given object, 
+// to the class declaration prototype *ONLY*
 var
-    Class1 = Class.$define('Class1'),
+    Class1 = ES5Class.$define('Class1'),
     obj = {yup: true},
     h = function(){};
 
@@ -248,12 +254,16 @@ h.yep = false;
 
 Class1.$include([obj, h]);
 
-console.log(Class1.$create().yup); // true (imported to the prototype)
-console.log(Class1.nope); // undefined (not imported since it's in the prototype of the &quot;h&quot; object)
-console.log(Class1.$create().nope); // undefined (not imported since it's in the prototype of the &quot;h&quot; object)
-console.log(Class1.$create().yep); // false (imported to the prototype since it's in the declaration of the &quot;h&quot; object)
+// true (imported to the prototype)
+console.log(Class1.$create().yup); 
+// undefined (not imported since it's in the prototype of the &quot;h&quot; object)
+console.log(Class1.nope); 
+// undefined (not imported since it's in the prototype of the &quot;h&quot; object)
+console.log(Class1.$create().nope); 
+// false (imported to the prototype since it's in the declaration of the &quot;h&quot; object)
+console.log(Class1.$create().yep);
 </code></pre>
-<h4>Inherit from any existing Node.js class</h4><pre><code class="lang-javascript">var MyEventClass = Class.$define('MyEventEmitter', function(){
+<h4>Inherit from any existing (Node.js) class</h4><pre><code class="lang-javascript">var MyEventClass = ES5Class.$define('MyEventEmitter', function(){
   var base = this;
   base.$implement(require('events').EventEmitter); // inherit from EventEmitter
 
@@ -271,8 +281,23 @@ MyEventClass.$create().on('created', function(base){
     expect(base).to.eql(MyEventClass);
     expect(base.prototype.on).to.be.a('function');
 });
+
+// or
+
+MyEventClass.$inherit(require('events').EventEmitter, []);
 </code></pre>
-<h4>Encapsulate logic by passing a closure</h4><pre><code class="lang-javascript">Bird.$include(function (_super){ // _super is the Animal prototype (the parent), it contains only &quot;construct&quot; and &quot;getName&quot; per definitions above
+<h4>Constants</h4><pre><code class="lang-javascript">var
+  MyClass = ES5Class.$define('MyClass').$const({
+    cant: 'touch this'
+  });
+  MyClass.cant = false; 
+  // still 'touch this'
+  // throws exception on strict mode
+</code></pre>
+<h4>Encapsulate logic by passing a closure</h4><pre><code class="lang-javascript">Bird.$include(function (_super){ 
+  // _super is the Animal prototype (the parent), it contains only 
+  // &quot;construct&quot; and &quot;getName&quot; per definitions above
+
   // &quot;super&quot; is a javascript reserved word, that's why it's being called _super here
   var timesBeaked = 0;
   // &quot;this&quot; refers to the current Class definition, that is, Bird, so you can access
@@ -289,11 +314,14 @@ MyEventClass.$create().on('created', function(base){
   };
 });
 
-Bird.$implement(function (_super){ // _super is the Animal class itself (the parent)
+Bird.$implement(function (_super){ 
+  // _super is the Animal class itself (the parent)
+
   // &quot;this&quot; refers to the current Class definition, the same way it happens
   // when extending the prototype (using $include), you may access this.prototype in
   // here as well
   var catalog = {};
+
   return {
     catalog: function (bird){ // Bird.catalog() is now available
       if (arguments.length) {
@@ -306,7 +334,28 @@ Bird.$implement(function (_super){ // _super is the Animal class itself (the par
   };
 });
 </code></pre>
-<h4>Extending a class</h4><pre><code class="lang-javascript">// These functions and values persist between class creation, serve as static methods
+<h4>Exchange the instance prototype chain</h4><pre><code class="lang-javascript">var MyEmptyClass = ESClass.$define('MyEmptyClass');
+MyEmptyClass.$create().$exchange(Error); // MyEmptyClass instance now 'looks like' an Error instance
+</code></pre>
+<h4>Import an object to the current instance</h4><pre><code class="lang-javascript">var MyEmptyClass = ESClass.$define('MyEmptyClass');
+var instance = MyEmptyClass.$create().$import({
+    somenew: function(){
+    }
+});
+instance.somenew();
+</code></pre>
+<h4>Enumerate members</h4><pre><code class="lang-javascript">ES5Class.$define('MyClass',{
+    some:'member',
+    somefn:function(){}
+}).$create().$names;
+
+// ['some','somefn']
+</code></pre>
+<h4>Wrap an existing object or function as an ES5Class</h4><pre><code class="lang-javascript">var someRandomObject = {};
+var MyClass = ES5Class.$wrap(someRandomObject, 'MyClass'); // creates a new class 
+ES5Class.$wrap(MyClass); // returns itself
+</code></pre>
+<h4>Prototypal inheritance from another class</h4><pre><code class="lang-javascript">// These functions and values persist between class creation, serve as static methods
 Animal.$implement({
     run: function() {
         for(var i=1; i&lt;=10; i++) {
@@ -337,6 +386,9 @@ Dog.$implement({
 });
 
 Dog.run(); // Dog.ran is now 40, Animal.ran and Cat.ran are now 20
+
+// primitives are copied over to new classes (in this case, Cat and Dog)
+// objects retain their reference between all classes
 </code></pre>
 <h4>Creating an instance</h4><pre><code class="lang-javascript">var animal = Animal.$create(&quot;An Animal&quot;);
 var bird = Bird.$create(&quot;A Bird&quot;);
@@ -358,12 +410,12 @@ bird.$parent.$parent.$className   // 'ES5Class'
 bird.$isClass(Bird);              // true
 Animal.$isClass(Bird);            // false
 </code></pre>
-<h4>Mixin from other classes</h4><pre><code class="lang-javascript">var Class1 = Class.$define('Class1', {}, {done: true}),
-    Class2 = Class.$define('Class2', {func: function(){ return true; }}),
-    Class3 = Class.$define('Class3', {}, {yet: true});
+<h4>Mixin from other classes (Object composition)</h4><pre><code class="lang-javascript">var Class1 = ES5Class.$define('Class1', {}, {done: true}),
+    Class2 = ES5Class.$define('Class2', {func: function(){ return true; }}),
+    Class3 = ES5Class.$define('Class3', {}, {yet: true});
 
 // This mix in the whole class (prototype and class methods)
-var NewClass = Class.$define('NewClass', {}, [Class1, Class2, Class3]);
+var NewClass = ES5Class.$define('NewClass', {}, [Class1, Class2, Class3]);
 
 // Pay attention that it needs to go in the second parameter if you want
 // to copy the object properties AND the prototype properties
@@ -380,31 +432,35 @@ console.log(NewClass.$create().func()); // true
 console.log(NewClass.$create().$class.done); // true
 
 // This mix in class methods as prototypes
-NewClass = Class.$define('NewClass', [Class1, Class2, Class3]);
+NewClass = ES5Class.$define('NewClass', [Class1, Class2, Class3]);
 
 console.log(NewClass.$create().yet); // true
 console.log(NewClass.$create().done); // false
 console.log(NewClass.$create().func); // undefined
 </code></pre>
-<h4>Singletons</h4><pre><code class="lang-javascript">var Singleton = Class.$define('Singleton', {}, {
+<h4>Singletons</h4><pre><code class="lang-javascript">var Singleton = ES5Class.$define('Singleton', {}, {
     staticHelper: function(){
         return 'helper';
     },
     staticVariable: 1
 });
 
-var ExtraSingleton = Class.$define('Extra');
+var ExtraSingleton = ES5Class.$define('Extra');
 ExtraSingleton.$implement(Singleton);
 ExtraSingleton.$implement({
-    extra: true
+    extra: true,
+    staticHelper: function($super){
+      return 'Extra' + $super();
+    }
 });
 
 ExtraSingleton.staticHelper() // outputs 'helper'
 Singleton.extra // undefined
 ExtraSingleton.extra // true
 ExtraSingleton.staticVariable // 1
+ExtraSingleton.staticHelper(); // 'Extrahelper'
 </code></pre>
-<h4>Share data between instances (flyweight pattern)</h4><pre><code class="lang-javascript">var Share = Class.$define('Share', function(){
+<h4>Share data between instances (flyweight pattern)</h4><pre><code class="lang-javascript">var Share = ES5Class.$define('Share', function(){
     var _data = {}; //all private data, that is shared between each Share.$create()
 
     return {
@@ -423,7 +479,7 @@ one.append('dub', true); // _data is now {'dub': true}
 two.append('dub', false); // _data is now {'dub': false}
 two.append('bleh', [1,2,3]); // _data is now {'dub': false, 'bleh': [1,2,3]}
 </code></pre>
-<h4>Duck typing (nothing stops you to not using inheritance and decoupling classes)</h4><pre><code class="lang-javascript">var Op = Class.$define('Op', {
+<h4>Duck typing (nothing stops you to not using inheritance and decoupling classes)</h4><pre><code class="lang-javascript">var Op = ES5Class.$define('Op', {
     construct: function (number){
       this.number = number;
     },
@@ -450,7 +506,7 @@ two.append('bleh', [1,2,3]); // _data is now {'dub': false, 'bleh': [1,2,3]}
     }
   });
 
-  var Operation = Class.$define('Operation', {}, function (){
+  var Operation = ES5Class.$define('Operation', {}, function (){
     var
       classes = [],
       number = 0;
@@ -504,16 +560,16 @@ The <code>ES5Class.$define</code> is a real bottleneck (as low as 10k ops/s). So
 <pre><code class="lang-bash">$ npm install &amp;&amp; npm run benchmark
 </code></pre>
 <p>A benchmark result in a 1st gen Core i3:</p>
-<pre><code>class instance function call x 114,056,673 ops/sec ±6.33% (33 runs sampled)
-class method function call x 114,195,944 ops/sec ±3.86% (70 runs sampled)
-class instance included function call x 105,647,876 ops/sec ±4.55% (43 runs sampled)
-$super instance function calls x 14,142,842 ops/sec ±0.40% (98 runs sampled)
-$super class function calls x 13,981,525 ops/sec ±0.27% (99 runs sampled)
-$super inherited two levels deep function calls x 6,966,387 ops/sec ±0.42% (97 runs sampled)
-class.$create instantiation x 1,901,561 ops/sec ±1.51% (90 runs sampled)
-new operator x 4,526,628 ops/sec ±0.70% (97 runs sampled)
-obj() instance x 1,246,228 ops/sec ±2.01% (89 runs sampled)
-ES5Class.$define x 12,414 ops/sec ±2.40% (86 runs sampled)
+<pre><code>class instance function call x 125,269,746 ops/sec ±10.00% (34 runs sampled)
+class method function call x 123,280,719 ops/sec ±4.17% (40 runs sampled)
+class instance included function call x 103,738,852 ops/sec ±3.78% (42 runs sampled)
+$super instance function calls x 14,187,910 ops/sec ±0.44% (96 runs sampled)
+$super class function calls x 13,874,190 ops/sec ±0.73% (96 runs sampled)
+$super inherited two levels deep function calls x 6,910,075 ops/sec ±0.40% (100 runs sampled)
+class.$create instantiation x 1,832,552 ops/sec ±1.69% (91 runs sampled)
+new operator x 4,544,620 ops/sec ±0.37% (98 runs sampled)
+obj() instance x 1,225,367 ops/sec ±2.45% (96 runs sampled)
+ES5Class.$define x 12,106 ops/sec ±2.73% (85 runs sampled)
 </code></pre><!--- old performance data, kept for historic reasons
 ```
 class instance function call x 1,598,593 ops/sec ±1.33% (92 runs sampled)
@@ -529,6 +585,10 @@ Auto instantiation x 1,276,445 ops/sec ±1.11% (93 runs sampled)
 -->
 
 <h2>Feeback</h2><p>Please use the issues section of github to report any bug you may find</p>
+<h5>Contributors</h5><ul>
+<li><a href="https://github.com/bfil">bfil</a></li>
+<li><a href="https://github.com/pocesar">pocesar</a></li>
+</ul>
 <h2>License</h2><p>(The MIT License)</p>
 <p>Copyright (c) 2011 Bruno Filippone</p>
 <p>Permission is hereby granted, free of charge, to any person obtaining
@@ -563,7 +623,8 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p></article>
 					
 		<span class="jsdoc-message">
 		Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha5</a>
-		on 31 / 05 / 2014 using the <a href="https://github.com/terryweiss/docstrap">DocStrap template</a>.
+		on 02 / 06 / 2014 using the <a
+			href="https://github.com/terryweiss/docstrap">DocStrap template</a>.
 		</span>
 				</footer>
 			</div>
@@ -577,23 +638,16 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p></article>
 		</div>
 
 	</div>
-	<script src="scripts/sunlight.js"></script>
-	<script src="scripts/sunlight.xml.js"></script>
-	<script src="scripts/sunlight.javascript.js"></script>
-	<script src="scripts/sunlight-plugin.doclinks.js"></script>
-	<script src="scripts/sunlight-plugin.linenumbers.js"></script>
-	<script src="scripts/sunlight-plugin.menu.js"></script>
-	<script src="scripts/jquery.min.js"></script>
-	<script src="scripts/jquery.scrollTo.js"></script>
-	<script src="scripts/jquery.localScroll.js"></script>
+	<!--<script src="scripts/sunlight.js"></script>-->
+	<script src="scripts/docstrap.lib.js"></script>
 	<script src="scripts/bootstrap-dropdown.js"></script>
 	<script src="scripts/toc.js"></script>
 
 	<script>
 		$( function () {
 			$( "#toc" ).toc( {
-			    anchorName  : function(i, heading, prefix) {
-					return $(heading).attr("id") || ( prefix + i );
+				anchorName  : function ( i, heading, prefix ) {
+					return $( heading ).attr( "id" ) || ( prefix + i );
 				},
 				selectors   : "h1,h2,h3,h4",
 				showAndHide : false,
@@ -601,31 +655,69 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p></article>
 			} );
 			$( "#toc>ul" ).addClass( "nav nav-pills nav-stacked" );
 			$( "#main span[id^='toc']" ).addClass( "toc-shim" );
-			$(".tutorial-section pre" ).addClass("sunlight-highlight-javascript" ).addClass("linenums");
-			Sunlight.highlightAll({lineNumbers: false,  showMenu: true, enableDoclinks: true});
+			$('.dropdown-toggle').dropdown();
+//			$( ".tutorial-section pre, .readme-section pre" ).addClass( "sunlight-highlight-javascript" ).addClass( "linenums" );
+
+			$( ".tutorial-section pre, .readme-section pre" ).each( function () {
+				var $this = $( this );
+
+				var example = $this.find("code" );
+				exampleText = example.html();
+				var lang = /{@lang (.*?)}/.exec( exampleText );
+				if ( lang && lang[1] ) {
+					exampleText = exampleText.replace( lang[0], "" );
+					example.html(exampleText);
+					lang = lang[1];
+				} else {
+					lang = "javascript";
+				}
+
+				if ( lang ) {
+
+					$this
+						.addClass( "sunlight-highlight-" + lang )
+						.addClass( "linenums" )
+						.html( example.html() );
+
+				}
+			} );
+
+			Sunlight.highlightAll( {
+				lineNumbers : false,
+				showMenu:true,
+				enableDoclinks:true
 		} );
+		} );
+
 	</script>
 
-
-
+	<!--Google Analytics-->
 	
-    <script>
-      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+	<script>
+		(function ( i, s, o, g, r, a, m ) {
+			i['GoogleAnalyticsObject'] = r;
+			i[r] = i[r] || function () {
+				(i[r].q = i[r].q || []).push( arguments )
+			}, i[r].l = 1 * new Date();
+			a = s.createElement( o ),
+				m = s.getElementsByTagName( o )[0];
+			a.async = 1;
+			a.src = g;
+			m.parentNode.insertBefore( a, m )
+		})( window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga' );
 
-      ga('create', 'UA-10569443-28', 'pocesar.github.io');
-      ga('send', 'pageview');
-
-    </script>
+		ga( 'create', 'UA-10569443-28', 'pocesar.github.io' );
+		ga( 'send', 'pageview' );
+	</script>
 	
+
+	<!--Navigation and Symbol Display-->
 	
 	<script>
 		$( function () {
-			$('#main').localScroll({
-				offset: { top: 56 } //offset by the height of your header (give or take a few px, see what works for you)
-			});
+			$( '#main' ).localScroll( {
+				offset : { top : 60 } //offset by the height of your header (give or take a few px, see what works for you)
+			} );
 			$( "dt h4.name" ).each( function () {
 				var $this = $( this );
 				var icon = $( "<i/>" ).addClass( "icon-plus-sign" ).addClass( "pull-right" ).addClass( "icon-white" );
