@@ -80,7 +80,7 @@
 
   function isObject(obj){
     return obj !== undefined && obj !== null && obj.constructor !== undefined &&
-    (obj.constructor === Object || typeof obj === 'object');
+    (obj.constructor === Object || Object.prototype.toString.call(obj) === '[object Object]');
   }
 
   function isFunction(obj){
@@ -501,16 +501,27 @@
             self.$include(obj[i]);
           }
         } else if (
-          isPlainFunction(obj) &&
-          (typeof (newfunc = obj.call(self, self.$parent.prototype)) === 'object')
+          isPlainFunction(obj)
         ) {
-          // Include the result of the closure if it's not null/undefined
-          self.$include(newfunc);
+          if ((newfunc = obj.call(self, self.$parent.prototype)) &&
+              (isObject(newfunc) || isArray(newfunc))) {
+            // Include the result of the closure if it's not null/undefined
+            self.$include(newfunc);
+          }
         } else {
           for (var key in obj) {
             if (hwp.call(obj, key)) {
               descriptor = gpd(obj, key);
-              if (descriptor !== undefined && (configurables[key] !== undefined || descriptor.set !== undefined || descriptor.get !== undefined)) {
+              if (
+                    descriptor !== undefined && (
+                    configurables[key] !== undefined ||
+                    descriptor.set !== undefined ||
+                    descriptor.get !== undefined ||
+                    descriptor.writable === false ||
+                    descriptor.configurable === false ||
+                    descriptor.enumerable === false
+                  )
+                ) {
                 Object.defineProperty(self.prototype, key, descriptor);
               } else if (key !== 'prototype') {
                 if (isFunction(obj[key])) {
@@ -559,15 +570,17 @@
             }
           }
         } else if (
-          isPlainFunction(obj) &&
-          (typeof (newfunc = obj.call(self, self.$parent)) === 'object')
+          isPlainFunction(obj)
         ) {
-          // Class should implement the closure result only
-          // if the function returns something
-          if (importing){
-            ES5Class.$implement.call(self, newfunc, apply, importing);
-          } else {
-            self.$implement(newfunc, apply, importing);
+          if ((newfunc = obj.call(self, self.$parent)) &&
+              (isObject(newfunc) || isArray(newfunc))) {
+            // Class should implement the closure result only
+            // if the function returns something
+            if (importing){
+              ES5Class.$implement.call(self, newfunc, apply, importing);
+            } else {
+              self.$implement(newfunc, apply, importing);
+            }
           }
         } else {
           if (
@@ -578,17 +591,18 @@
           }
 
           for (var key in obj) {
-            descriptor = gpd(obj, key);
-            if (descriptor !== undefined && (
-                descriptor.set ||
-                descriptor.get ||
-                descriptor.writable === false ||
-                descriptor.configurable === false ||
-                descriptor.enumerable === false)
-            ) {
-              Object.defineProperty(self, key, descriptor);
-            } else {
-              if (key !== 'prototype') {
+            if (key !== 'prototype') {
+              descriptor = gpd(obj, key);
+              if (descriptor !== undefined && (
+                  descriptor.set !== undefined ||
+                  descriptor.get !== undefined ||
+                  descriptor.writable === false ||
+                  descriptor.configurable === false ||
+                  descriptor.enumerable === false
+                )
+              ) {
+                Object.defineProperty(self, key, descriptor);
+              } else {
                 if (isFunction(obj[key])) {
                   // Wrap the function for $super usage
                   func = functionWrapper(key, obj, (isFunction(self[key]) ? self[key] : noop), self);
@@ -737,7 +751,7 @@
    * @static
    */
   Object.defineProperty(ES5Class, '$version', {
-    value: '2.2.1'
+    value: '2.3.0'
   });
 
   /**

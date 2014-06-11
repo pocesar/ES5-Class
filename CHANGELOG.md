@@ -1,3 +1,8 @@
+## 2.3.0
+* Fixed bug that makes `$include` apply descriptors correctly 
+* Added composition test
+* **BEHAVIOR MIGHT CHANGE WHEN IMPLEMENTING/INCLUDING FUNCTIONS** 
+
 ## 2.2.1
 * Changes to documentation, mostly `README.md`
 * Fixed bug that makes `$implement` apply descriptors correctly 

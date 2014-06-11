@@ -2,6 +2,7 @@
 [![Coverage Status](https://coveralls.io/repos/pocesar/ES5-Class/badge.png?branch=master)](https://coveralls.io/r/pocesar/ES5-Class?branch=master)
 [![devDependency Status](https://david-dm.org/pocesar/es5-class/dev-status.svg)](https://david-dm.org/pocesar/es5-class#info=devDependencies)
 [![Github Repository](http://img.shields.io/badge/github-repo-orange.svg)](https://github.com/pocesar/ES5-Class)
+[![Check Documentation](http://img.shields.io/badge/check-documentation-blue.svg)](http://pocesar.github.io/ES5-Class)
 ![API Stability: Stable](http://img.shields.io/badge/api-stable-brightgreen.svg)
 
 <!-- [![browser support](https://ci.testling.com/pocesar/ES5-Class.png)](https://ci.testling.com/pocesar/ES5-Class) -->
@@ -107,7 +108,7 @@ var ES5Class = require('es5class');
 window.ES5Class
 
 // or with RequireJS
-require(['ES5Class'], function(ES5Class){
+define(['ES5Class'], function(ES5Class){
 
 });
 ```
@@ -486,7 +487,6 @@ ExtraSingleton.$implement({
     }
 });
 
-ExtraSingleton.staticHelper() // outputs 'helper'
 Singleton.extra // undefined
 ExtraSingleton.extra // true
 ExtraSingleton.staticVariable // 1

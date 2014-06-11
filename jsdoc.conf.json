@@ -23,8 +23,8 @@
     "copyright"        : "",
     "navType"          : "inline",
     "theme"            : "united",
-    "linenums"         : false,
-    "collapseSymbols"  : true,
+    "linenums"         : true,
+    "collapseSymbols"  : false,
     "inverseNav"       : false,
     "analytics"        : {
       "ua": "UA-10569443-28",

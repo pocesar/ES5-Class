@@ -265,6 +265,8 @@ describe('ES5Class', function (){
 
     Cls.$implement(null);
     Cls.$include(null);
+    Cls.$include(function(){});
+    Cls.$implement(function(){});
 
     expect(Cls.$create()).to.eql({});
   });
@@ -511,6 +513,39 @@ describe('ES5Class', function (){
       expect(Sub.static).to.be(1);
       Base.prototype.proto = 2;
       expect(Sub.$create().proto).to.be(1);
+    });
+
+    it('retain non primitive object reference', function(){
+      var obj = {
+        one: 1,
+        two: 2
+      }, Base = ES5Class.$define('Base', {
+        obj: obj
+      }), Sub = ES5Class.$define('Sub');
+
+      Sub.$implement(Base);
+
+      expect(Sub.$create().obj.one).to.be(1);
+      obj.one = 2;
+      expect(Sub.$create().obj.one).to.be(obj.one);
+    });
+
+    it('closure', function(){
+      var
+        Mixin1 = ES5Class.$define('Mixin1', {}, {'one':function(){}}),
+        Mixin2 = ES5Class.$define('Mixin2', {}, {'two':function(){}}),
+        obj = [Mixin1, Mixin2];
+
+      var Mixined = ES5Class.$define('Mixined');
+      Mixined.$implement(function(){
+        return obj;
+      });
+      Mixined.$include(function(){
+        return obj;
+      });
+
+      expect(Mixined.$implements).to.eql(obj);
+      expect(Mixined.prototype.one).to.be(Mixin1.one);
     });
 
   });
@@ -807,30 +842,34 @@ describe('ES5Class', function (){
     });
   });
 
-  it('$delegate', function (){
-    var Cls = ES5Class.$define('Cls', {
-      subObject: {
-        delegation: function (val){
-          return !!val;
+  describe('$delegate', function (){
+
+    it('submember delegation', function(){
+      var Cls = ES5Class.$define('Cls', {
+        subObject: {
+          delegation: function (val){
+            return !!val;
+          }
         }
-      }
-    }, {
-      delegated: function (argument){
-        return argument;
-      }
+      }, {
+        delegated: function (argument){
+          return argument;
+        }
+      });
+
+      expect(Cls.delegated('asdf')).to.be('asdf');
+
+      var cls = new Cls();
+
+      cls.$delegate().method('delegated');
+
+      expect(cls.delegated('asdf')).to.be('asdf');
+
+      cls.$delegate('subObject').method({name: 'delegation', as: 'doh'});
+
+      expect(cls.doh('adsf')).to.be(true);
     });
 
-    expect(Cls.delegated('asdf')).to.be('asdf');
-
-    var cls = new Cls();
-
-    cls.$delegate().method('delegated');
-
-    expect(cls.delegated('asdf')).to.be('asdf');
-
-    cls.$delegate('subObject').method({name: 'delegation', as: 'doh'});
-
-    expect(cls.doh('adsf')).to.be(true);
   });
 
   it('$isES5Class', function (){
@@ -1654,5 +1693,136 @@ describe('ES5Class', function (){
   it('constructor', function (){
     expect(typeof Bird).to.be('function');
     expect(Bird.$create).to.be.a('function');
+  });
+
+  describe('object composition', function(){
+
+    // taken from npmjs.org/package/paladin for the awesomeness
+    it('A javascript version of Moorcock\'s Stormbringer Saga', function(){
+      /**
+       * A javascript version of Moorcock's Stormbringer Saga
+       */
+
+      function Character () {
+        this.name = '';
+      }
+
+      function Sorcerer () {
+        return {
+          cast: function(spell) {
+            console.log(this.name + ' is casting ' + spell);
+            return this;
+          }
+        };
+      }
+
+      function Warrior () {
+        var weapon = '';
+        return {
+          setWeapon: function (weaponObject) {
+            weapon = weaponObject;
+            return this;
+          },
+          getWeapon: function() {
+            return weapon;
+          }
+        };
+      }
+
+      function skills() {
+        var _skills = [], skillsModule;
+        skillsModule = {
+          addSkill: function(name) {
+            _skills.push(name);
+            return skillsModule.addSkill;
+          },
+          getSkills: function() {
+            return _skills;
+          }
+        };
+        return skillsModule;
+      }
+
+      function Sword() {
+        var name = '';
+        this.prototype.setName = function(weaponName) {
+          name = weaponName;
+        };
+        this.prototype.getName = function() {
+          return name;
+        };
+      }
+
+      function Demon() {
+        this.suckLife = function() {
+          console.log('I\'m sucking life out of my victim');
+        };
+      }
+
+      function battleCast() {
+        //console.log(this.name + ' is casting spells while wielding ' + this.getWeapon().getName() );
+        return this.name + ' is casting spells while wielding ' + this.getWeapon().getName();
+      }
+
+      function destroyWorld() {
+        //console.log('Blowing the Horn of Fate and destroying the world right now....');
+        return 'Blowing the Horn of Fate and destroying the world right now....';
+      }
+
+      // create a sword that's also a demon
+      var DemonSword = ES5Class.$define('DemonSword', [Sword, Demon]),
+        // Stormbringer is the coolest sword in the universe
+        Stormbringer = DemonSword.$define('Stormbringer', {
+          construct: function($super) {
+            $super();
+            this.setName('Stormbringer');
+          }
+        }).$create()/*,
+        // MournBlade is Stormbringer's twin blade
+        MournBlade = DemonSword.$define('MournBlade', {
+          construct: function($super){
+            this.setName('MournBlade');
+            $super();
+          }
+        }).$create()*/;
+
+      expect(DemonSword.suckLife).to.be.a('function');
+      // create the race of Melnibone'
+      var Melnibonean = ES5Class.$define('Melnibonean', [Character, Sorcerer, Warrior]),
+        // create Elric, the antihero and attach the battleCast method alised as fight
+        Elric = Melnibonean.$define('Elric', {
+          construct: function($super){
+            $super();
+            // set Elric's weapon to Stormbringer
+            this.setWeapon(Stormbringer);
+          },
+          name: 'Elric',
+          fight: battleCast,
+          destroy: destroyWorld,
+          // add the skills module (namespaced to skills)
+          skills: skills()
+        }).$create()/*,
+        // Yrkoon is Elric's evil cousin who happens to wield MournBlade
+        Yrkoon = Melnibonean.$define('Yrkoon', {
+          construct: function ($super){
+            // set Elric's weapon to Stormbringer
+            this.setWeapon(MournBlade);
+            $super();
+          },
+          name     : 'Yrkoon'
+        })*/;
+
+      expect(Melnibonean.prototype).to.have.keys(['cast','setWeapon','getWeapon']);
+      // let's test everything works as supposed
+      expect(Elric.fight()).to.be('Elric is casting spells while wielding Stormbringer');
+      // this is interesting because addSkill() returns addSkill so you can chain brackets
+      // until - of course - Elric destroys the world...
+      Elric.skills.addSkill('Summon Arioch')('Be an Albino Prince')('Destroy World');
+      // and let's print it out
+      //console.log('Elric has the following skills: ' + Elric.skills.getSkills().join(', '));
+      expect(Elric.skills.getSkills().join(', ')).to.be('Summon Arioch, Be an Albino Prince, Destroy World');
+      expect(Elric.destroy()).to.be('Blowing the Horn of Fate and destroying the world right now....');
+    });
+
   });
 });

@@ -1,7 +1,7 @@
 {
   "name"        : "es5class",
   "main"        : "index.js",
-  "version"     : "2.2.1",
+  "version"     : "2.3.0",
   "homepage"    : "https://github.com/pocesar/ES5-Class",
   "authors"     : [
     "Paulo Cesar <email@pocesar.e4ward.com>"
