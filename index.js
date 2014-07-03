@@ -42,14 +42,14 @@
       return obj[key];
     }
 
-    var fn = BetterCurry.wrap(superFn, context, superFn.__length, true);
+    var fn = BetterCurry.wrap(superFn, context, superFn.__length || obj[key].length, true);
     fn.$currentContext = context;
 
     var wrapped = function wrapped(){
       var self = this;
 
       if (fn.$currentContext !== self) {
-        fn = BetterCurry.wrap(superFn, self, fn.__length, true);
+        fn = BetterCurry.wrap(superFn, self, fn.__length || obj[key].length, true);
         fn.$currentContext = self;
       }
 
@@ -751,7 +751,7 @@
    * @static
    */
   Object.defineProperty(ES5Class, '$version', {
-    value: '2.3.0'
+    value: '2.3.1'
   });
 
   /**

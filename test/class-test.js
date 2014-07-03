@@ -411,6 +411,28 @@ describe('ES5Class', function (){
     expect(main.Sub.$instanceOf(Sub)).to.be(true);
   });
 
+  it('super construct', function(){
+    var
+      Base = ES5Class.$define('Base', {
+        construct: function(){
+          this.asdf = arguments[0];
+        }
+      }),
+      Sub = Base.$define('Sub', {
+        construct: function($super, asdf, ep) {
+          $super(asdf, ep);
+        }
+      }),
+      Ultra = Sub.$define('Ultra', {
+        construct: function($super) {
+          $super('asdf');
+          expect(this.asdf).to.be('asdf');
+        }
+      });
+
+      expect(Ultra.$create().asdf).to.be('asdf');
+  });
+
   it('async $super', function (done){
     var func = (typeof setImmediate === 'function' ? setImmediate : setTimeout);
 

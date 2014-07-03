@@ -1,3 +1,6 @@
+## 2.3.1
+* Fixed bug that doesn't take in account the length of the current created function 
+
 ## 2.3.0
 * Fixed bug that makes `$include` apply descriptors correctly 
 * Added composition test
